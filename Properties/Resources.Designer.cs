@@ -22,7 +22,7 @@ namespace SPM_Worker.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SPM_Worker.Properties {
         ///   Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SPM_Worker.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace SPM_Worker.Properties {
         ///   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,17 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap createz {
+        public static System.Drawing.Bitmap administrator {
+            get {
+                object obj = ResourceManager.GetObject("administrator", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap createz {
             get {
                 object obj = ResourceManager.GetObject("createz", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -73,7 +83,7 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap del_z {
+        public static System.Drawing.Bitmap del_z {
             get {
                 object obj = ResourceManager.GetObject("del_z", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -83,9 +93,9 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap discounts {
+        public static System.Drawing.Bitmap document_move {
             get {
-                object obj = ResourceManager.GetObject("discounts", resourceCulture);
+                object obj = ResourceManager.GetObject("document_move", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,7 +103,7 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap expens {
+        public static System.Drawing.Bitmap expens {
             get {
                 object obj = ResourceManager.GetObject("expens", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -103,7 +113,17 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap human {
+        public static System.Drawing.Bitmap fon {
+            get {
+                object obj = ResourceManager.GetObject("fon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap human {
             get {
                 object obj = ResourceManager.GetObject("human", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -111,19 +131,19 @@ namespace SPM_Worker.Properties {
         }
         
         /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Icon).
         /// </summary>
-        internal static System.Drawing.Bitmap img_chn {
+        public static System.Drawing.Icon icon {
             get {
-                object obj = ResourceManager.GetObject("img_chn", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap img_del {
+        public static System.Drawing.Bitmap img_del {
             get {
                 object obj = ResourceManager.GetObject("img_del", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -133,7 +153,7 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap img_prt {
+        public static System.Drawing.Bitmap img_prt {
             get {
                 object obj = ResourceManager.GetObject("img_prt", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -143,7 +163,17 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap logo {
+        public static System.Drawing.Bitmap Load {
+            get {
+                object obj = ResourceManager.GetObject("Load", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap logo {
             get {
                 object obj = ResourceManager.GetObject("logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -153,9 +183,9 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap prices {
+        public static System.Drawing.Bitmap pereobl_type {
             get {
-                object obj = ResourceManager.GetObject("prices", resourceCulture);
+                object obj = ResourceManager.GetObject("pereobl_type", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,7 +193,7 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap print {
+        public static System.Drawing.Bitmap print {
             get {
                 object obj = ResourceManager.GetObject("print", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -173,7 +203,7 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap printdone_z {
+        public static System.Drawing.Bitmap printdone_z {
             get {
                 object obj = ResourceManager.GetObject("printdone_z", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -183,9 +213,9 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap send_sms {
+        public static System.Drawing.Bitmap sold_type {
             get {
-                object obj = ResourceManager.GetObject("send_sms", resourceCulture);
+                object obj = ResourceManager.GetObject("sold_type", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -193,47 +223,7 @@ namespace SPM_Worker.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap settings {
-            get {
-                object obj = ResourceManager.GetObject("settings", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap sms {
-            get {
-                object obj = ResourceManager.GetObject("sms", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap sms_z {
-            get {
-                object obj = ResourceManager.GetObject("sms_z", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap sumzvit {
-            get {
-                object obj = ResourceManager.GetObject("sumzvit", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap write_z {
+        public static System.Drawing.Bitmap write_z {
             get {
                 object obj = ResourceManager.GetObject("write_z", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
