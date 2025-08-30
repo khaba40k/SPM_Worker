@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace SPM_Worker
 {
-
     public partial class ZAKAZ_FORM : Form
     {
         private bool HIDDEN_TOP = false;
@@ -43,7 +42,7 @@ namespace SPM_Worker
                 INFO = _input;
                 selectedLogin = _input.REDAKTOR;
             }
-
+            
             cb_worker.Items.AddRange(SERVICE_INFO.AUTORIZE_INFO.data.workerInfo);
 
             INFO_TOOL_TIP.OwnerDraw = true;
@@ -91,6 +90,11 @@ namespace SPM_Worker
                     return;
                 }
 
+                if (OUT == INFO) { 
+                    Close();
+                    return;
+                }
+
                 SERVICE_ID_LIST _komplekt = new SERVICE_ID_LIST(OUT.KOMPLEKT);
 
                 string messageText = $"Телефон: {OUT.PHONE}\n" +
@@ -98,7 +102,7 @@ namespace SPM_Worker
                        $"{OUT.COMM}\n" +
                        $"{_komplekt}";
 
-                if (OUT == INFO || DialogResult.Yes != CustomMessage.Show(
+                if (DialogResult.Yes != CustomMessage.Show(
                     messageText,
                     "Підтвердження",
                     MessageBoxButtons.YesNo,
@@ -198,6 +202,15 @@ namespace SPM_Worker
 
                 byte _disc = Convert.ToByte(INFO.DISCOUNT);
 
+                if (_disc > 0 && _disc < 100)
+                {
+                    DISCOUNT_PERCENT = _disc;
+                }
+                else
+                {
+                    DISCOUNT_PERCENT = null;
+                }
+
                 tb_discount.Text = _disc.ToString();
 
                 if (_disc > 0) tb_discount.Enabled = false;
@@ -211,13 +224,13 @@ namespace SPM_Worker
                 {
                     if (_messengers[i].ToLower().Contains(_firstLetter))
                     {
-                        INFO.COMM = INFO.COMM.Remove(0, _firstLetter.Length).TrimStart();
+                        tb_comm.Text = INFO.COMM.Substring(_firstLetter.Length).TrimStart();
                         _mesIndex = i;
                         break;
                     }
                 }
 
-                tb_comm.Text = INFO.COMM;
+                //tb_comm.Text = INFO.COMM;
                 cb_term.Checked = INFO.TERMINOVO;
                 cb_worker.Text = INFO.WORKER;
                 cb_redaktor.Text = INFO.REDAKTOR;
@@ -239,6 +252,16 @@ namespace SPM_Worker
             {
                 tb_discount.TextChanged += (s, e) =>
                 {
+                    if (byte.TryParse(tb_discount.Text, out byte prc)
+                              && prc > 0 && prc < 100)
+                    {
+                        DISCOUNT_PERCENT = prc;
+                    }
+                    else
+                    {
+                        DISCOUNT_PERCENT = null;
+                    }
+
                     if (!tb_discount.Enabled) return;
 
                     string _text = tb_discount.Text.Trim().ToUpper();
@@ -271,6 +294,7 @@ namespace SPM_Worker
                             if (_text.Length == 5)
                             {
                                 _discount = SERVICE_INFO.GetDiscountByCode(_text);
+                                if (_discount > 0) DISCOUNT_CODE = _text;
                             }
                             else
                             {
@@ -284,14 +308,13 @@ namespace SPM_Worker
                             $"Задіяти знижку {_discount}% для поточної заявки?",
                             "ЗНИЖКА",
                             MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Exclamation))
+                            MessageBoxIcon.Exclamation, new MessButText { Yes = $"{_discount}%" }))
                         {
                             //Задіяти знижку
 
                             tb_discount.Enabled = false;
                             butDiscount.Visible = false;
                             tb_discount.Width += butDiscount.Width;
-                            DISCOUNT_CODE = _text.Length == 5 ? _text : null;
                             DISCOUNT_PERCENT = _discount;
                             DiscountChanged?.Invoke(this, (byte)DISCOUNT_PERCENT);
                             tb_discount.Text = _discount.ToString();
@@ -318,7 +341,7 @@ namespace SPM_Worker
 
             if (_input != null)
             {
-                if (_input.TYPE == Z_TYPE.CONVERSION)
+                if (_input.TYPE == Z_TYPE.CONV)
                 {
                     pereoblInterface1.SET(_input.KOMPLEKT, _input.DISCOUNT ?? 0);
                 }
@@ -343,7 +366,7 @@ namespace SPM_Worker
             if (INFO.TYPE == Z_TYPE.NULL 
                 && pereoblInterface1.HAS_VALUE ^ soldInterface1.HAS_VALUE)
             {
-                INFO.TYPE = pereoblInterface1.HAS_VALUE ? Z_TYPE.CONVERSION : Z_TYPE.SOLD;
+                INFO.TYPE = pereoblInterface1.HAS_VALUE ? Z_TYPE.CONV : Z_TYPE.SOLD;
                 HideTab();
             } else if (INFO.TYPE != Z_TYPE.NULL
                 && !pereoblInterface1.HAS_VALUE && !soldInterface1.HAS_VALUE)
@@ -377,7 +400,7 @@ namespace SPM_Worker
         {
             if (HIDDEN_TAB != null)
             {
-                int _ind = (INFO.TYPE == Z_TYPE.CONVERSION ? 1 : 0);
+                int _ind = (INFO.TYPE == Z_TYPE.CONV ? 1 : 0);
 
                 tabControl1.TabPages.Insert(_ind, HIDDEN_TAB);
 
@@ -394,7 +417,7 @@ namespace SPM_Worker
         {
             if (HIDDEN_TAB != null) return;
 
-            int _ind = (INFO.TYPE == Z_TYPE.CONVERSION ? 1 : 0);
+            int _ind = (INFO.TYPE == Z_TYPE.CONV ? 1 : 0);
 
             HIDDEN_TAB = tabControl1.TabPages[_ind];
 
@@ -457,7 +480,7 @@ namespace SPM_Worker
                 message += $"{counter++}) Відповідальний.\n";
             }
 
-            if (ANSWER.TYPE == Z_TYPE.CONVERSION && pereoblInterface1.HAS_UNCHECKED)
+            if (ANSWER.TYPE == Z_TYPE.CONV && pereoblInterface1.HAS_UNCHECKED)
             {
                 message += $"{counter++}) Оберіть (Так/Ні) зі списку послуг!";
             }
@@ -468,8 +491,9 @@ namespace SPM_Worker
             ANSWER.TTN_OUT = NullIfEmpty(tb_ttnout.Text);
             ANSWER.COMM = NullIfEmpty((cb_messendger.Text + " " + tb_comm.Text.TrimStart()));
 
-            if (DISCOUNT_PERCENT != null)
             ANSWER.DISCOUNT = DISCOUNT_PERCENT;
+
+            ANSWER.DISCOUNT_CODE = DISCOUNT_CODE;
 
             ANSWER.WORKER = NullIfEmpty(cb_worker.Text);
 
@@ -488,7 +512,7 @@ namespace SPM_Worker
         {
             List<VitratyInfo> _products;
 
-            if (INFO.TYPE == Z_TYPE.CONVERSION)
+            if (INFO.TYPE == Z_TYPE.CONV)
             {
                 _products = pereoblInterface1.PRODUCTS.Select(s=>new VitratyInfo(s))
                     .ToList();

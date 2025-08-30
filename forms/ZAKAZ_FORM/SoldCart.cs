@@ -8,10 +8,14 @@ namespace SPM_Worker
 {
     public partial class SoldCart : UserControl
     {
-        public int NUMBER { get => _number; set { 
-                _number = value; 
-                lb_num.Text = _number.ToString(); 
-            } }
+        public int NUMBER
+        {
+            get => _number; set
+            {
+                _number = value;
+                lb_num.Text = _number.ToString();
+            }
+        }
         private int _number = 1;
         public VitratyInfo VALUE { get; private set; } = new VitratyInfo();
         public bool HAS_CHANGE { get { return cb_name.SelectedIndex > -1; } }
@@ -61,7 +65,8 @@ namespace SPM_Worker
             cb_type.MouseWheel += ComboBox_MouseWheel;
             cb_color.MouseWheel += ComboBox_MouseWheel;
 
-            List<ONE_SERVICE_INFO> ID_NAME_list = SERVICE_INFO.GetAllServiceNameList(_atr, _input == null);
+            List<ONE_SERVICE_INFO> ID_NAME_list = SERVICE_INFO
+                .GetAllServiceNameList(_atr, _input == null);
 
             tb_cost.Text = (0f).ToString("F2");
 
@@ -97,7 +102,7 @@ namespace SPM_Worker
                 ONE_SERVICE_INFO _item = (ONE_SERVICE_INFO)cb_name.SelectedItem 
                 ?? new ONE_SERVICE_INFO() { ID = -1, NAME = "" };
 
-                ZakazEventArgs _ea = new ZakazEventArgs(_item.ID);
+                ZakazEventArgs _ea = new ZakazEventArgs(_item.ID ?? -1);
 
                 _ea.Index = NUMBER - 1;
 
@@ -105,16 +110,7 @@ namespace SPM_Worker
 
                 if (cb_name.SelectedIndex > 0)
                 {
-                    VALUE.ID = _item.ID;
-
-                    VALUE.RefreshATR();
-
-                    if (VALUE.IS_POSLUGA)
-                    {
-                        tb_count.Text = "1";
-                    }
-
-                    tb_count.Enabled = !VALUE.IS_POSLUGA;
+                    VALUE.ID = _item.ID ?? -1;
 
                     tb_cost.Text = (VALUE.COUNT
                                      * (SERVICE_INFO.GetCost(VALUE.ID, VALUE.TYPE_ID)
@@ -122,6 +118,13 @@ namespace SPM_Worker
                                      .ToString("F2");
 
                     if (!InitTYPES()) InitCOLORS();
+
+                    if (VALUE.IS_POSLUGA && !VALUE.HAS_COLOR)
+                    {
+                        tb_count.Text = "1";
+                    }
+
+                    tb_count.Enabled = !VALUE.IS_POSLUGA || VALUE.HAS_COLOR;
                 }
                 else
                 {

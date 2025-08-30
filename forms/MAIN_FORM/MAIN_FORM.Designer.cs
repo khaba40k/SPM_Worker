@@ -30,29 +30,39 @@ namespace SPM_Worker
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MAIN_FORM));
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MENU_CONTEXT = new System.Windows.Forms.MenuStrip();
+            this.mcFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveCSVhistory = new System.Windows.Forms.ToolStripMenuItem();
             this.panelContent = new System.Windows.Forms.Panel();
             this.panelMenu = new System.Windows.Forms.FlowLayoutPanel();
-            this.menuStrip1.SuspendLayout();
+            this.MENU_CONTEXT.SuspendLayout();
             this.SuspendLayout();
             // 
-            // menuStrip1
+            // MENU_CONTEXT
             // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.файлToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(982, 28);
-            this.menuStrip1.TabIndex = 2;
-            this.menuStrip1.Text = "menuStrip1";
+            this.MENU_CONTEXT.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.MENU_CONTEXT.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mcFile});
+            this.MENU_CONTEXT.Location = new System.Drawing.Point(0, 0);
+            this.MENU_CONTEXT.Name = "MENU_CONTEXT";
+            this.MENU_CONTEXT.Size = new System.Drawing.Size(982, 30);
+            this.MENU_CONTEXT.TabIndex = 2;
             // 
-            // файлToolStripMenuItem
+            // mcFile
             // 
-            this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
-            this.файлToolStripMenuItem.Size = new System.Drawing.Size(59, 24);
-            this.файлToolStripMenuItem.Text = "Файл";
+            this.mcFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveCSVhistory});
+            this.mcFile.Name = "mcFile";
+            this.mcFile.Size = new System.Drawing.Size(59, 26);
+            this.mcFile.Text = "Файл";
+            // 
+            // saveCSVhistory
+            // 
+            this.saveCSVhistory.Image = global::SPM_Worker.Properties.Resources.printdone_z;
+            this.saveCSVhistory.Name = "saveCSVhistory";
+            this.saveCSVhistory.Size = new System.Drawing.Size(190, 26);
+            this.saveCSVhistory.Text = "Історія товару";
+            this.saveCSVhistory.Visible = false;
             // 
             // panelContent
             // 
@@ -73,9 +83,9 @@ namespace SPM_Worker
             this.panelMenu.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelMenu.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.panelMenu.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.panelMenu.Location = new System.Drawing.Point(0, 28);
+            this.panelMenu.Location = new System.Drawing.Point(0, 30);
             this.panelMenu.Name = "panelMenu";
-            this.panelMenu.Size = new System.Drawing.Size(179, 525);
+            this.panelMenu.Size = new System.Drawing.Size(179, 523);
             this.panelMenu.TabIndex = 4;
             this.panelMenu.WrapContents = false;
             // 
@@ -87,24 +97,25 @@ namespace SPM_Worker
             this.ClientSize = new System.Drawing.Size(982, 553);
             this.Controls.Add(this.panelMenu);
             this.Controls.Add(this.panelContent);
-            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.MENU_CONTEXT);
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.menuStrip1;
+            this.MainMenuStrip = this.MENU_CONTEXT;
             this.Name = "MAIN_FORM";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SHOLOM";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.MENU_CONTEXT.ResumeLayout(false);
+            this.MENU_CONTEXT.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem файлToolStripMenuItem;
+        private System.Windows.Forms.MenuStrip MENU_CONTEXT;
+        private System.Windows.Forms.ToolStripMenuItem mcFile;
         private System.Windows.Forms.Panel panelContent;
         private System.Windows.Forms.FlowLayoutPanel panelMenu;
+        private System.Windows.Forms.ToolStripMenuItem saveCSVhistory;
     }
 }

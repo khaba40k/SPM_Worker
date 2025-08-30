@@ -49,6 +49,7 @@ namespace SPM_Worker
         }
         private bool _has_global_deff = false;
         public bool HAS_CHANGE => SELECTED_ANY && !SELECTED_NO;
+        private bool LockDeffCost = true;
         public float DiscountKoef
         {
             get => _globDiscKoef; set
@@ -57,7 +58,8 @@ namespace SPM_Worker
                 {
                     _globDiscKoef = value;
 
-                    if (!DeffValueLoaded) CART_COST *= _globDiscKoef;
+                    if ((DeffValueLoaded && !LockDeffCost) || !DeffValueLoaded)
+                         CART_COST *= _globDiscKoef;
                 }
             }
         }
@@ -242,6 +244,11 @@ namespace SPM_Worker
 
                 ID_CHANGED?.Invoke(this, new ZakazEventArgs(CART_SERVICE_ID) { CHECKED = true });
             };
+        }
+
+        public void UnLockDeffCost()
+        {
+            LockDeffCost = false;
         }
 
         private void ComboBoxColor_DrawItem(object sender, DrawItemEventArgs e)

@@ -14,9 +14,11 @@ namespace SPM_Worker
 {
     public partial class ZakazListControl : UserControl
     {
+        public IEnumerable<ZakazInfo> Items => allItems ?? new List<ZakazInfo>();
+        private IEnumerable<ZakazInfo> FilteredItems => _filtered();
         private bool PAUSE_JSON_QUERY = false;
-        private List<ZakazInfo> CheckedZakazList = new List<ZakazInfo>();
-        public JSON_ZAKAZ_LIST ZAKAZ_LIST = new JSON_ZAKAZ_LIST();
+        private IEnumerable<ZakazInfo> CheckedZakazList => Items.Where(z => z.Checked == true);
+        public JSON_ZAKAZ_LIST ZAKAZ_LIST { get; set; } = new JSON_ZAKAZ_LIST();
         private ZAKAZ_CATCH _CATCH = new ZAKAZ_CATCH();
         private Dictionary<Z_STATUS, DateTime?> LastUpdateAt = new Dictionary<Z_STATUS, DateTime?>(); 
         public event EventHandler<SizeEventHandler> _SizeChanged;
@@ -24,8 +26,7 @@ namespace SPM_Worker
         public Z_STATUS STATUS { get; set; } = Z_STATUS.NEW;
         private Z_STATUS prew_status = Z_STATUS.NULL;
         private System.Threading.Timer backgroundTimer;
-        private const byte AUTO_REFRESH_TIME = 5;
-        private bool StatusChanged = false;
+        private const byte AUTO_REFRESH_TIME = 3;
 
         private List<ZakazInfo> allItems = new List<ZakazInfo>();
 
@@ -59,8 +60,6 @@ namespace SPM_Worker
 
                 STATUS = Z_STATUS.NEW;
 
-                StatusChanged = true;
-                
                 REFRESH_LIST(STATUS);
             };
 
@@ -85,8 +84,6 @@ namespace SPM_Worker
 
                 STATUS = Z_STATUS.ACTIVE;
 
-                StatusChanged = true;
-                
                 REFRESH_LIST(STATUS);
             };
 
@@ -103,8 +100,6 @@ namespace SPM_Worker
                 PAUSE_JSON_QUERY = false;
 
                 STATUS = Z_STATUS.ARCHIVE;
-
-                StatusChanged = true;
 
                 REFRESH_LIST(STATUS);
             };
@@ -125,9 +120,7 @@ namespace SPM_Worker
                 label_count.Text = $"ЗА СПИСКОМ: {flpList.Controls.Count}";
             };
 
-            butDelete.Click += (s, e) => {
-                Delete(CheckedZakazList);
-            };
+            butDelete.Click += (s, e) => Delete(CheckedZakazList.ToList());
         }
 
         private void FlpList_ClientSizeChanged(object sender, EventArgs e)
@@ -309,7 +302,7 @@ namespace SPM_Worker
 
             List<CheckComboBoxItem> _filters = new List<CheckComboBoxItem>();
 
-            ZAKAZ _zFilter = ZAKAZ_LIST.Items.Find(f => f.TYPE == Z_TYPE.CONVERSION);
+            ZAKAZ _zFilter = ZAKAZ_LIST.Items.Find(f => f.TYPE == Z_TYPE.CONV);
 
             if (_zFilter != null)
             {
@@ -339,13 +332,17 @@ namespace SPM_Worker
                     cbFilter.GetMemoryChecked($"redaktor:{_red}")));
             }
 
-            cbFilter.Items.AddRange(_filters);
+            cbFilter.Items.AddRange(_filters.ToArray());
 
             ClearAll();
 
-            AddZakaz(ZAKAZ_LIST.Items.Select(z=>new ZakazInfo(z)).ToList());
+            AddItemOnPanel(ZAKAZ_LIST.Items.ToArray());
 
             prew_status = STATUS;
+
+            SOME_CHANGED = false;
+
+            ApplyFilterAndSort();
         }
 
         private JSON_ZAKAZ_LIST GET_LIST(
@@ -405,16 +402,14 @@ namespace SPM_Worker
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 return serializer.Deserialize<JSON_ZAKAZ_LIST>(responseText);
             }
-            catch (Exception ex)
+            catch
             {
-                CustomMessage.Show(ex.Message, "Помилка запиту", MessageBoxIcon.Hand);
                 return new JSON_ZAKAZ_LIST() { NeedUpdate = false };
             }
         }
 
         private void StartBackgroundTimer()
         {
-            // запуск таймера: callback у фоні, інтервал 2 сек
             backgroundTimer = new System.Threading.Timer(TimerRefreshCallback, null, 0, AUTO_REFRESH_TIME * 1000);
         }
 
@@ -424,53 +419,28 @@ namespace SPM_Worker
 
             try
             {
-                BeginInvoke((Action)(() =>
-                {
-                    REFRESH_LIST(STATUS);
-                }));
-            }catch (Exception ex)
+                BeginInvoke((Action)(() => REFRESH_LIST(STATUS)));
+            }
+            catch
             {
-                CustomMessage.Show(ex.Message);
+
             }
         }
 
         public void ClearAll()
         {
-            CheckedZakazList.Clear();
-            lb_count_checked.Text = "Вибрано: 0";
+            foreach (ZakazInfo _info in flpList.Controls)
+                if (_info.Checked) _info.Checked = false;
+
             lb_count_checked.Visible = false;
             but_print.Visible = false;
             butDelete.Visible = false;
 
             allItems.Clear();
-            //if (StatusChanged) {
-            //    StatusChanged = false;
-            //    flpList.Controls.Clear();
-            //}
         }
 
-        private void AddZakaz(List<ZakazInfo> _input)
+        private IEnumerable<ZakazInfo> _filtered()
         {
-            SOME_CHANGED = false;
-
-            foreach (ZakazInfo Z in _input)
-            {
-                Z.WriteZakaz += WriteZakaz;
-                Z.CheckedChange += CheckedChanged;
-                Z.RemoveZakaz += Delete;
-                Z.PrintZakaz += Print;
-                Z.MoveZakaz += moveZakaz;
-                _SizeChanged += Z.SetWidth;
-                allItems.Add(Z);
-            }
-
-            ApplyFilterAndSort();
-        }
-
-        private void ApplyFilterAndSort()
-        {
-            if (allItems == null || allItems.Count == 0) return;
-
             string[] _filters = cbFilter.CheckedTags;
 
             string search = txtSearch.Text.Trim().ToLower();
@@ -501,70 +471,104 @@ namespace SPM_Worker
 
             // Фільтрація
 
-            IEnumerable<ZakazInfo> filtered;
+            IEnumerable<ZakazInfo> _tempList = Items.Where(i =>
+                _types.Contains(i.TYPE)
+                && redaktors.Contains(i.REDAKTOR));
 
-            filtered = allItems.Where(i =>
-            _types.Contains(i.TYPE)
-            && redaktors.Contains(i.REDAKTOR));
-
-            if (!string.IsNullOrEmpty(search))
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                filtered = filtered.Where(item =>
+                _tempList = _tempList.Where(item =>
                 item.INFO.NUMBER.ToString().Contains(search) ||
                 item.INFO.CLIENT_NAME.ToLower().Contains(search) ||
+                (item.INFO.COMM?.ToLower() ?? "").Contains(search) ||
                 item.INFO.PHONE.ToLower().Contains(search) ||
                 item.INFO.KOMPLEKT.Find(k => item.GetNameAndType(k.service_ID, k.type_ID).ToLower().Contains(search)) != null
                );
             }
 
-            //List<ZakazInfo> _temp = filtered.ToList();
+            return _tempList;
+        }
+
+        public void AddItemOnPanel(ZAKAZ[] z)
+        {
+            int i;
+            int StartNewInd = z.Length;
+
+            //Видаляємо зайві
+            if (flpList.Controls.Count > z.Length)
+            {
+                int curInd = flpList.Controls.Count - 1;
+
+                for (i = curInd; i >= z.Length; i--)
+                flpList.Controls.RemoveAt(i);
+            }
+
+            //Додаємо невистачаючі
+            if (z.Length > flpList.Controls.Count)
+            {
+                List<ZakazInfo> _temp = new List<ZakazInfo>();
+
+                StartNewInd = flpList.Controls.Count;
+
+                for (i = StartNewInd; i < z.Length; i++)
+                {
+                    ZakazInfo nz = new ZakazInfo(z[i]);
+                    SetEvents(nz);
+
+                    _temp.Add(nz);
+                }
+
+                flpList.Controls.AddRange(_temp.ToArray());
+
+                allItems.AddRange(_temp);
+            }
+
+            for (i = 0; i < StartNewInd; i++)
+            {
+                ZakazInfo _inf = flpList.Controls[i] as ZakazInfo;
+                _inf.INFO = z[i];
+
+                allItems.Add(_inf);
+            }
+        }
+
+        private void SetEvents(ZakazInfo _inf)
+        {
+            _inf.WriteZakaz += WriteZakaz;
+            _inf.CheckedChange += CheckedChanged;
+            _inf.RemoveZakaz += Delete;
+            _inf.PrintZakaz += Print;
+            _inf.MoveZakaz += moveZakaz;
+            _SizeChanged += _inf.SetWidth;
+        }
+
+        private void ApplyFilterAndSort()
+        {
+            if (Items.Count() == 0) return;
 
             flpList.SuspendLayout();
 
-            //foreach (ZakazInfo _info in flpList.Controls)
-            //{
-            //    if (!_temp.Contains(_info))
-            //    {
-            //        flpList.Controls.Remove(_info);
-            //    }
-            //    else
-            //    {
-            //        _temp.Remove(_info);
-            //    }
-            //}
+            List<ZakazInfo> _filtered = FilteredItems.ToList();
 
-            //flpList.Controls.Clear();
+            int countShow = flpList.Controls.Count;
 
-            int oldCount = flpList.Controls.Count;
-
-            flpList.Controls.AddRange(filtered.ToArray());
-
-            for (int i = 0; i < oldCount; i++)
+            foreach (ZakazInfo _fltr in flpList.Controls)
             {
-                //flpList.Controls.RemoveAt(0);
-
-                RemoveItem(0);
+                if (!_filtered.Contains(_fltr))
+                {
+                    _fltr.Hide();
+                    countShow--;
+                }
+                else if (!_fltr.Visible)
+                {
+                    _fltr.Show();
+                }
             }
 
-            //flpList.Controls.AddRange(_temp.ToArray());
-
-            //_temp = flpList.Controls
-            //    .OfType<ZakazInfo>()
-            //    .OrderByDescending(o => o.DATE)
-            //    .ToList();
-
-            //for (int i = 0; i < _temp.Count; i++){
-            //    flpList.Controls.SetChildIndex(_temp[i], i);
-            //}
+            label_count.Text = $"ЗА СПИСКОМ: {countShow}";
 
             flpList.ResumeLayout();
         }
-
-        private async void RemoveItem(int index)
-        {
-            flpList.Controls.RemoveAt(index);
-            await Task.Delay(50);
-        } 
 
         public void WriteZakaz(object sender, ZakazEventArgs e)
         {
@@ -591,13 +595,9 @@ namespace SPM_Worker
 
             _finded.Checked = e.CHECKED;
 
-            List<ZakazInfo> temp = allItems.FindAll(z => z.Checked == true);
-
-            CheckedZakazList = temp;
-
-            if (temp.Count > 0)
+            if (CheckedZakazList.Count() > 0)
             {
-                lb_count_checked.Text = $"Вибрано: {temp.Count}";
+                lb_count_checked.Text = $"Вибрано: {CheckedZakazList.Count()}";
                 lb_count_checked.Visible = true;
                 butDelete.Visible = true;
                 but_print.Visible = true;
@@ -611,8 +611,6 @@ namespace SPM_Worker
             }
 
         }
-
-        public IEnumerable<ZakazInfo> Items => allItems;
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
@@ -671,7 +669,7 @@ namespace SPM_Worker
 
         private void but_print_Click(object sender, EventArgs e)
         {
-            PrintZakaz(CheckedZakazList);
+            PrintZakaz(CheckedZakazList.ToList());
         }
 
         private void Print(object sender, byte stat)

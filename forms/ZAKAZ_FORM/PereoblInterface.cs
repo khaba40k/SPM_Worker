@@ -120,6 +120,7 @@ namespace SPM_Worker
 
             foreach (ServiceCart _cart in container.Controls)
             {
+                _cart.UnLockDeffCost();
                 _cart.DiscountKoef = globalDiscountKoef;
             }
 

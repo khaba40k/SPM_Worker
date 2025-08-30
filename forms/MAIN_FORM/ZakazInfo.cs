@@ -10,27 +10,34 @@ namespace SPM_Worker
 {
     public partial class ZakazInfo : UserControl, IEquatable<ZakazInfo>
     {
-        public bool Checked { get { return cb_Index.Checked; } set { cb_Index.Checked = value; } }
-        public byte TYPE { get { return (byte)INFO.TYPE; } }
-        private int RightButWidth = 0;
-        public DateTime? DATE
+        public bool Checked
         {
-            get
+            get => cb_Index.Checked;
+            set
             {
-                if (INFO.STATUS == Z_STATUS.ARCHIVE)
-                {
-                    return INFO.DATE_OUT;
-                }
-                else
-                {
-                    return INFO.DATE_MAX;
-                }
+                if (cb_Index.Checked == value) return;
+
+                cb_Index.Checked = value;
+                BackColor = bcgrndColorDef;
             }
         }
-        public string REDAKTOR => INFO.REDAKTOR;
-        public ZAKAZ INFO { get; private set; }
+        public byte TYPE { get { return (byte)INFO.TYPE; } }
+        private int RightButWidth = 0;
+        public DateTime? DATE => INFO.STATUS == Z_STATUS.ARCHIVE ? INFO.DATE_OUT : INFO.DATE_MAX;
+        public string REDAKTOR => INFO?.REDAKTOR;
+        public int ID => INFO?.ID ?? -1;
+        public ZAKAZ INFO
+        {
+            get => _curInfo; set
+            {
+                _curInfo = value;
+                SET_INFO(_curInfo, true);
+            }
+        }
 
-        Color bcgrndColorDef;
+        private ZAKAZ _curInfo = null;
+
+        Color bcgrndColorDef = Color.Khaki;
         Color checkedColor = Color.Aqua;
         Color hoverColor = Color.LightBlue;
 
@@ -48,23 +55,9 @@ namespace SPM_Worker
 
             DoubleBuffered = true;
 
-            INFO = _input;
-
-            _image = INFO.TYPE == Z_TYPE.SOLD ? Properties.Resources.sold_type
-                : Properties.Resources.pereobl_type;
-
-            DoubleBuffered = true;
-
-            HandleCreated += (s, e) => BeginInvoke((MethodInvoker)INIT_DATA);
-        }
-
-        private void INIT_DATA()
-        {
             toolTip1.OwnerDraw = true;
             toolTip1.Draw += ToolTip1_Draw;
             toolTip1.Popup += ToolTip1_Popup;
-
-            TOOL_TIP_INIT();
 
             #region Mouse enter/leave logic
 
@@ -76,14 +69,7 @@ namespace SPM_Worker
 
             #endregion
 
-            MouseClick += MyUserControl_MouseClick;
-
-            DoubleClick += (s, e) =>
-            {
-                WriteZakaz?.Invoke(INFO, new ZakazEventArgs(INFO.ID));
-            };
-
-            bcgrndColorDef = BackColor;
+            DoubleClick += (s, e) => WriteZakaz?.Invoke(INFO, new ZakazEventArgs(INFO?.ID ?? -1));
 
             cb_Index.CheckedChanged += (s, e) => {
 
@@ -102,6 +88,29 @@ namespace SPM_Worker
                     BorderStyle = BorderStyle.Fixed3D;
                 }
             };
+
+            MouseClick += MyUserControl_MouseClick;
+
+            SET_INFO(_input);
+        }
+
+        private void SET_INFO(ZAKAZ _inputZakaz, bool RePaint = false)
+        {
+            _curInfo = _inputZakaz;
+
+            Checked = false;
+
+            INIT_DATA();
+
+            if (RePaint) Refresh();
+        }
+
+        private void INIT_DATA()
+        {
+            _image = INFO.TYPE == Z_TYPE.SOLD ? Properties.Resources.sold_type
+                     : Properties.Resources.pereobl_type;
+
+            BackColor = bcgrndColorDef;
 
             Color _statusColor = Color.White;
 
@@ -317,9 +326,8 @@ namespace SPM_Worker
         #region GPT
         private void TOOL_TIP_INIT()
         {
-            toolTip1.ToolTipTitle = "Інформація по замовленню" + (INFO.NUMBER > 0 ? " №" + INFO.NUMBER.ToString() : "");
-
-            string TTtext = $"{INFO.DATE_IN} -> {INFO.DATE_MAX.ToShortDateString()}\n" +
+            string TTtext = "Інформація по замовленню" + (INFO.NUMBER > 0 ? " №" + INFO.NUMBER.ToString() : "") +
+                            $"\n{INFO.DATE_IN} -> {INFO.DATE_MAX.ToShortDateString()}\n" +
                             $"{INFO.COMM}\n\n" +
                             new SERVICE_ID_LIST(INFO.KOMPLEKT).ToString() +
                             $"{INFO.REDAKTOR}";
@@ -392,6 +400,8 @@ namespace SPM_Worker
 
                 Refresh();
             }
+
+            TOOL_TIP_INIT();
         }
 
         private void Shared_MouseLeave(object sender, EventArgs e)
@@ -404,6 +414,8 @@ namespace SPM_Worker
 
                 Refresh();
             }
+
+            toolTip1.Hide(this);
         }
 
         public bool Equals(ZakazInfo other) => INFO.Equals(other.INFO);
@@ -488,7 +500,7 @@ namespace SPM_Worker
 
         public override string ToString()
         {
-            return INFO.CLIENT_NAME;
+            return INFO.STATUS + " " + INFO.TYPE + " " + INFO.CLIENT_NAME.Split(' ')[0];
         }
     }
 
