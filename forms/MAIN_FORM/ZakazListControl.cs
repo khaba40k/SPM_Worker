@@ -137,7 +137,7 @@ namespace SPM_Worker
         private void moveZakaz(object sender, ZakazEventArgs e)
         {
             ZAKAZ _inf = (ZAKAZ)sender;
-            bool toPrint = false;
+            PrintType toPrint = PrintType.EMPTY;
 
             if (e.STATUS == Z_STATUS.NEW)
             {
@@ -150,7 +150,7 @@ namespace SPM_Worker
                             : null;
 
                         SOME_CHANGED = _inf.TTN_IN != null;
-                        toPrint = SOME_CHANGED;
+                        toPrint = SOME_CHANGED ? PrintType.Worker : PrintType.EMPTY;
                     }
                 }
             }
@@ -182,13 +182,14 @@ namespace SPM_Worker
                         _inf.DATE_OUT = DateTime.Now;
 
                         SOME_CHANGED = _inf.TTN_OUT != null;
+                        toPrint = SOME_CHANGED ? PrintType.Short : PrintType.EMPTY;
                     }
                 }
             }
 
             if (SOME_CHANGED && SERVICE_INFO.SAVE_ZAKAZ(_inf, out string mes))
             {
-                if (!toPrint)
+                if (toPrint == PrintType.EMPTY)
                 {
                     CustomMessage.Show(mes, "Статус",
                            MessageBoxIcon.Information);
@@ -203,7 +204,7 @@ namespace SPM_Worker
                         List<ZakazInfo> curZakaz = new List<ZakazInfo>();
                         curZakaz.Add(new ZakazInfo(_inf));
 
-                        PrintZakaz(curZakaz, PrintType.Worker);
+                        PrintZakaz(curZakaz, toPrint);
                     }
                 }
             }
@@ -585,6 +586,12 @@ namespace SPM_Worker
                 if (SOME_CHANGED)
                 {
                     REFRESH_LIST_WITH_DELAY(50);
+
+                    if (_zakazForm.TO_PRINT_FROM_WORKER)
+                    {
+                        PrintZakaz(new List<ZakazInfo> { new ZakazInfo(_zakazForm.INFO) },
+                             PrintType.Worker);
+                    }
                 }
             }
         }
@@ -732,6 +739,12 @@ namespace SPM_Worker
                 if (SOME_CHANGED)
                 {
                     REFRESH_LIST_WITH_DELAY(100);
+
+                    if (_formCreate.TO_PRINT_FROM_WORKER)
+                    {
+                        PrintZakaz(new List<ZakazInfo> { new ZakazInfo(_formCreate.INFO) },
+                             PrintType.Worker);
+                    }
                 }
             }
         }

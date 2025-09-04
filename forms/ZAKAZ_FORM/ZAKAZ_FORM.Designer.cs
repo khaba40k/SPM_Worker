@@ -42,6 +42,8 @@ namespace SPM_Worker
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -49,7 +51,9 @@ namespace SPM_Worker
             this.tb_comm = new System.Windows.Forms.TextBox();
             this.tb_ttnout = new System.Windows.Forms.TextBox();
             this.tb_ttnin = new System.Windows.Forms.TextBox();
-            this.tb_name = new System.Windows.Forms.TextBox();
+            this.tb_name3 = new System.Windows.Forms.TextBox();
+            this.tb_name2 = new System.Windows.Forms.TextBox();
+            this.tb_name1 = new System.Windows.Forms.TextBox();
             this.tb_phone = new System.Windows.Forms.TextBox();
             this.dt_do = new System.Windows.Forms.DateTimePicker();
             this.dt_done = new System.Windows.Forms.DateTimePicker();
@@ -57,15 +61,15 @@ namespace SPM_Worker
             this.panel2 = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tab0 = new System.Windows.Forms.TabPage();
-            this.pereoblInterface1 = new SPM_Worker.PereoblInterface();
             this.tab1 = new System.Windows.Forms.TabPage();
-            this.soldInterface1 = new SPM_Worker.SoldInterface();
             this.label10 = new System.Windows.Forms.Label();
             this.cb_worker = new System.Windows.Forms.ComboBox();
             this.label9 = new System.Windows.Forms.Label();
             this.cb_redaktor = new System.Windows.Forms.ComboBox();
             this.INFO_TOOL_TIP = new System.Windows.Forms.ToolTip(this.components);
             this.buttonSave = new System.Windows.Forms.Button();
+            this.pereoblInterface1 = new SPM_Worker.PereoblInterface();
+            this.soldInterface1 = new SPM_Worker.SoldInterface();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -86,6 +90,8 @@ namespace SPM_Worker
             this.panel1.Controls.Add(this.label7);
             this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.label12);
+            this.panel1.Controls.Add(this.label11);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label1);
@@ -93,7 +99,9 @@ namespace SPM_Worker
             this.panel1.Controls.Add(this.tb_comm);
             this.panel1.Controls.Add(this.tb_ttnout);
             this.panel1.Controls.Add(this.tb_ttnin);
-            this.panel1.Controls.Add(this.tb_name);
+            this.panel1.Controls.Add(this.tb_name3);
+            this.panel1.Controls.Add(this.tb_name2);
+            this.panel1.Controls.Add(this.tb_name1);
             this.panel1.Controls.Add(this.tb_phone);
             this.panel1.Controls.Add(this.dt_do);
             this.panel1.Controls.Add(this.dt_done);
@@ -101,7 +109,7 @@ namespace SPM_Worker
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(726, 183);
+            this.panel1.Size = new System.Drawing.Size(726, 193);
             this.panel1.TabIndex = 0;
             // 
             // butSetNPformat
@@ -110,7 +118,7 @@ namespace SPM_Worker
             this.butSetNPformat.Cursor = System.Windows.Forms.Cursors.Hand;
             this.butSetNPformat.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.butSetNPformat.ForeColor = System.Drawing.Color.White;
-            this.butSetNPformat.Location = new System.Drawing.Point(97, 59);
+            this.butSetNPformat.Location = new System.Drawing.Point(98, 74);
             this.butSetNPformat.Name = "butSetNPformat";
             this.butSetNPformat.Size = new System.Drawing.Size(55, 27);
             this.butSetNPformat.TabIndex = 16;
@@ -127,10 +135,11 @@ namespace SPM_Worker
             this.butGetNpList.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.butGetNpList.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.butGetNpList.ForeColor = System.Drawing.Color.White;
-            this.butGetNpList.Location = new System.Drawing.Point(687, 59);
+            this.butGetNpList.Location = new System.Drawing.Point(688, 74);
             this.butGetNpList.Name = "butGetNpList";
             this.butGetNpList.Size = new System.Drawing.Size(32, 23);
-            this.butGetNpList.TabIndex = 3;
+            this.butGetNpList.TabIndex = 4;
+            this.butGetNpList.TabStop = false;
             this.butGetNpList.Text = "...";
             this.butGetNpList.UseVisualStyleBackColor = false;
             this.butGetNpList.Click += new System.EventHandler(this.butGetNpList_Click);
@@ -138,19 +147,21 @@ namespace SPM_Worker
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(0, 63);
+            this.label8.Location = new System.Drawing.Point(1, 78);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(96, 17);
+            this.label8.Size = new System.Drawing.Size(96, 16);
             this.label8.TabIndex = 15;
             this.label8.Text = "Реквізити НП";
             // 
             // tb_reqv
             // 
-            this.tb_reqv.Location = new System.Drawing.Point(155, 60);
+            this.tb_reqv.Location = new System.Drawing.Point(156, 75);
             this.tb_reqv.MaxLength = 100;
             this.tb_reqv.Name = "tb_reqv";
+            this.tb_reqv.ShortcutsEnabled = false;
             this.tb_reqv.Size = new System.Drawing.Size(526, 22);
-            this.tb_reqv.TabIndex = 2;
+            this.tb_reqv.TabIndex = 5;
+            this.tb_reqv.WordWrap = false;
             // 
             // butDiscount
             // 
@@ -158,11 +169,11 @@ namespace SPM_Worker
             this.butDiscount.Cursor = System.Windows.Forms.Cursors.Hand;
             this.butDiscount.Enabled = false;
             this.butDiscount.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.butDiscount.Location = new System.Drawing.Point(223, 146);
+            this.butDiscount.Location = new System.Drawing.Point(210, 161);
             this.butDiscount.Margin = new System.Windows.Forms.Padding(0);
             this.butDiscount.Name = "butDiscount";
             this.butDiscount.Size = new System.Drawing.Size(78, 25);
-            this.butDiscount.TabIndex = 9;
+            this.butDiscount.TabIndex = 11;
             this.butDiscount.Text = "задіяти";
             this.butDiscount.UseVisualStyleBackColor = false;
             // 
@@ -170,10 +181,10 @@ namespace SPM_Worker
             // 
             this.cb_messendger.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cb_messendger.FormattingEnabled = true;
-            this.cb_messendger.Location = new System.Drawing.Point(436, 88);
+            this.cb_messendger.Location = new System.Drawing.Point(437, 103);
             this.cb_messendger.Name = "cb_messendger";
             this.cb_messendger.Size = new System.Drawing.Size(283, 24);
-            this.cb_messendger.TabIndex = 5;
+            this.cb_messendger.TabIndex = 7;
             // 
             // cb_term
             // 
@@ -181,9 +192,9 @@ namespace SPM_Worker
             this.cb_term.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cb_term.Cursor = System.Windows.Forms.Cursors.Hand;
             this.cb_term.ForeColor = System.Drawing.Color.Red;
-            this.cb_term.Location = new System.Drawing.Point(304, 148);
+            this.cb_term.Location = new System.Drawing.Point(305, 164);
             this.cb_term.Name = "cb_term";
-            this.cb_term.Size = new System.Drawing.Size(98, 21);
+            this.cb_term.Size = new System.Drawing.Size(98, 20);
             this.cb_term.TabIndex = 10;
             this.cb_term.TabStop = false;
             this.cb_term.Text = "Терміново";
@@ -192,63 +203,82 @@ namespace SPM_Worker
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(0, 152);
+            this.label6.Location = new System.Drawing.Point(1, 167);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(141, 17);
+            this.label6.Size = new System.Drawing.Size(135, 16);
             this.label6.TabIndex = 4;
             this.label6.Text = "Дисконт (знижка %)";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(329, 121);
+            this.label7.Location = new System.Drawing.Point(330, 136);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(73, 17);
+            this.label7.Size = new System.Drawing.Size(71, 16);
             this.label7.TabIndex = 4;
             this.label7.Text = "Коментар";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(329, 93);
+            this.label5.Location = new System.Drawing.Point(330, 108);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(57, 17);
+            this.label5.Size = new System.Drawing.Size(57, 16);
             this.label5.TabIndex = 4;
             this.label5.Text = "Зв\'язок";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(0, 121);
+            this.label4.Location = new System.Drawing.Point(1, 136);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(98, 17);
+            this.label4.Size = new System.Drawing.Size(95, 16);
             this.label4.TabIndex = 4;
             this.label4.Text = "ТТН (вихідна)";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(536, 30);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(84, 16);
+            this.label12.TabIndex = 4;
+            this.label12.Text = "По батькові";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(365, 30);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(29, 16);
+            this.label11.TabIndex = 4;
+            this.label11.Text = "Ім\'я";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(329, 35);
+            this.label2.Location = new System.Drawing.Point(162, 30);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(101, 17);
+            this.label2.Size = new System.Drawing.Size(69, 16);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Прізвище, ім\'я";
+            this.label2.Text = "Прізвище";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(0, 93);
+            this.label3.Location = new System.Drawing.Point(1, 108);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(90, 17);
+            this.label3.Size = new System.Drawing.Size(87, 16);
             this.label3.TabIndex = 4;
             this.label3.Text = "ТТН (вхідна)";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(0, 35);
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Location = new System.Drawing.Point(0, 30);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(82, 17);
+            this.label1.Size = new System.Drawing.Size(79, 16);
             this.label1.TabIndex = 4;
             this.label1.Text = "Номер тел.";
             // 
@@ -260,12 +290,12 @@ namespace SPM_Worker
             "10",
             "30"});
             this.tb_discount.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.tb_discount.Location = new System.Drawing.Point(155, 149);
+            this.tb_discount.Location = new System.Drawing.Point(142, 164);
             this.tb_discount.MaxLength = 5;
             this.tb_discount.Name = "tb_discount";
             this.tb_discount.ShortcutsEnabled = false;
             this.tb_discount.Size = new System.Drawing.Size(65, 22);
-            this.tb_discount.TabIndex = 8;
+            this.tb_discount.TabIndex = 10;
             this.tb_discount.Text = "0";
             this.tb_discount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.INFO_TOOL_TIP.SetToolTip(this.tb_discount, "Можна вводить як цифрами (від 1 до 99) так і код знижки");
@@ -276,50 +306,79 @@ namespace SPM_Worker
             // 
             // tb_comm
             // 
-            this.tb_comm.Location = new System.Drawing.Point(436, 118);
+            this.tb_comm.Location = new System.Drawing.Point(437, 133);
             this.tb_comm.MaxLength = 200;
             this.tb_comm.Multiline = true;
             this.tb_comm.Name = "tb_comm";
             this.tb_comm.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tb_comm.ShortcutsEnabled = false;
             this.tb_comm.Size = new System.Drawing.Size(283, 54);
-            this.tb_comm.TabIndex = 7;
+            this.tb_comm.TabIndex = 9;
             this.INFO_TOOL_TIP.SetToolTip(this.tb_comm, "Якщо потрібно окремо коментар для робітника,\r\nпостав перед ним !!! Все що буде на" +
         "писано перед !!!\r\nне роздрукується робітнику");
             // 
             // tb_ttnout
             // 
-            this.tb_ttnout.Location = new System.Drawing.Point(98, 118);
+            this.tb_ttnout.Location = new System.Drawing.Point(99, 133);
             this.tb_ttnout.MaxLength = 100;
             this.tb_ttnout.Name = "tb_ttnout";
+            this.tb_ttnout.ShortcutsEnabled = false;
             this.tb_ttnout.Size = new System.Drawing.Size(225, 22);
-            this.tb_ttnout.TabIndex = 6;
+            this.tb_ttnout.TabIndex = 8;
             this.tb_ttnout.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tb_ttnout.WordWrap = false;
             // 
             // tb_ttnin
             // 
-            this.tb_ttnin.Location = new System.Drawing.Point(98, 90);
+            this.tb_ttnin.Location = new System.Drawing.Point(99, 105);
             this.tb_ttnin.MaxLength = 100;
             this.tb_ttnin.Name = "tb_ttnin";
+            this.tb_ttnin.ShortcutsEnabled = false;
             this.tb_ttnin.Size = new System.Drawing.Size(225, 22);
-            this.tb_ttnin.TabIndex = 4;
+            this.tb_ttnin.TabIndex = 6;
             this.tb_ttnin.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tb_ttnin.WordWrap = false;
             // 
-            // tb_name
+            // tb_name3
             // 
-            this.tb_name.Location = new System.Drawing.Point(436, 32);
-            this.tb_name.MaxLength = 100;
-            this.tb_name.Name = "tb_name";
-            this.tb_name.Size = new System.Drawing.Size(283, 22);
-            this.tb_name.TabIndex = 1;
+            this.tb_name3.Location = new System.Drawing.Point(539, 49);
+            this.tb_name3.MaxLength = 100;
+            this.tb_name3.Name = "tb_name3";
+            this.tb_name3.ShortcutsEnabled = false;
+            this.tb_name3.Size = new System.Drawing.Size(181, 22);
+            this.tb_name3.TabIndex = 3;
+            this.tb_name3.WordWrap = false;
+            // 
+            // tb_name2
+            // 
+            this.tb_name2.Location = new System.Drawing.Point(363, 49);
+            this.tb_name2.MaxLength = 100;
+            this.tb_name2.Name = "tb_name2";
+            this.tb_name2.ShortcutsEnabled = false;
+            this.tb_name2.Size = new System.Drawing.Size(170, 22);
+            this.tb_name2.TabIndex = 2;
+            this.tb_name2.WordWrap = false;
+            // 
+            // tb_name1
+            // 
+            this.tb_name1.Location = new System.Drawing.Point(165, 49);
+            this.tb_name1.MaxLength = 100;
+            this.tb_name1.Name = "tb_name1";
+            this.tb_name1.ShortcutsEnabled = false;
+            this.tb_name1.Size = new System.Drawing.Size(192, 22);
+            this.tb_name1.TabIndex = 1;
+            this.tb_name1.WordWrap = false;
             // 
             // tb_phone
             // 
-            this.tb_phone.Location = new System.Drawing.Point(98, 32);
-            this.tb_phone.MaxLength = 100;
+            this.tb_phone.Location = new System.Drawing.Point(4, 49);
+            this.tb_phone.MaxLength = 13;
             this.tb_phone.Name = "tb_phone";
-            this.tb_phone.Size = new System.Drawing.Size(225, 22);
+            this.tb_phone.ShortcutsEnabled = false;
+            this.tb_phone.Size = new System.Drawing.Size(155, 22);
             this.tb_phone.TabIndex = 0;
             this.tb_phone.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tb_phone.WordWrap = false;
             // 
             // dt_do
             // 
@@ -364,9 +423,9 @@ namespace SPM_Worker
             // 
             this.panel2.Controls.Add(this.tabControl1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 183);
+            this.panel2.Location = new System.Drawing.Point(0, 193);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(726, 268);
+            this.panel2.Size = new System.Drawing.Size(726, 313);
             this.panel2.TabIndex = 1;
             // 
             // tabControl1
@@ -378,7 +437,7 @@ namespace SPM_Worker
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(726, 268);
+            this.tabControl1.Size = new System.Drawing.Size(726, 313);
             this.tabControl1.TabIndex = 13;
             // 
             // tab0
@@ -389,20 +448,9 @@ namespace SPM_Worker
             this.tab0.Location = new System.Drawing.Point(4, 27);
             this.tab0.Name = "tab0";
             this.tab0.Padding = new System.Windows.Forms.Padding(3);
-            this.tab0.Size = new System.Drawing.Size(718, 237);
+            this.tab0.Size = new System.Drawing.Size(718, 282);
             this.tab0.TabIndex = 0;
             this.tab0.Text = "Переобладнання";
-            // 
-            // pereoblInterface1
-            // 
-            this.pereoblInterface1.AutoSize = true;
-            this.pereoblInterface1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pereoblInterface1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.pereoblInterface1.Location = new System.Drawing.Point(3, 3);
-            this.pereoblInterface1.Margin = new System.Windows.Forms.Padding(4);
-            this.pereoblInterface1.Name = "pereoblInterface1";
-            this.pereoblInterface1.Size = new System.Drawing.Size(712, 231);
-            this.pereoblInterface1.TabIndex = 0;
             // 
             // tab1
             // 
@@ -411,31 +459,17 @@ namespace SPM_Worker
             this.tab1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tab1.Location = new System.Drawing.Point(4, 27);
             this.tab1.Name = "tab1";
-            this.tab1.Size = new System.Drawing.Size(718, 237);
+            this.tab1.Size = new System.Drawing.Size(718, 282);
             this.tab1.TabIndex = 1;
             this.tab1.Text = "Продаж";
-            // 
-            // soldInterface1
-            // 
-            this.soldInterface1.ATR = 0;
-            this.soldInterface1.AutoSize = true;
-            this.soldInterface1.BackColor = System.Drawing.Color.Transparent;
-            this.soldInterface1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.soldInterface1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.soldInterface1.LayoutMode = SPM_Worker.SoldInterface.ControlLayoutMode.Default;
-            this.soldInterface1.Location = new System.Drawing.Point(0, 0);
-            this.soldInterface1.Margin = new System.Windows.Forms.Padding(4);
-            this.soldInterface1.Name = "soldInterface1";
-            this.soldInterface1.Size = new System.Drawing.Size(718, 237);
-            this.soldInterface1.TabIndex = 0;
             // 
             // label10
             // 
             this.label10.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(1, 467);
+            this.label10.Location = new System.Drawing.Point(1, 523);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(75, 17);
+            this.label10.Size = new System.Drawing.Size(75, 16);
             this.label10.TabIndex = 4;
             this.label10.Text = "Працівник";
             // 
@@ -444,18 +478,18 @@ namespace SPM_Worker
             this.cb_worker.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.cb_worker.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.cb_worker.FormattingEnabled = true;
-            this.cb_worker.Location = new System.Drawing.Point(82, 464);
+            this.cb_worker.Location = new System.Drawing.Point(82, 520);
             this.cb_worker.Name = "cb_worker";
             this.cb_worker.Size = new System.Drawing.Size(200, 24);
-            this.cb_worker.TabIndex = 12;
+            this.cb_worker.TabIndex = 14;
             // 
             // label9
             // 
             this.label9.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(285, 467);
+            this.label9.Location = new System.Drawing.Point(285, 523);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(109, 17);
+            this.label9.Size = new System.Drawing.Size(109, 16);
             this.label9.TabIndex = 4;
             this.label9.Text = "Відповідальний";
             // 
@@ -464,10 +498,10 @@ namespace SPM_Worker
             this.cb_redaktor.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.cb_redaktor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cb_redaktor.FormattingEnabled = true;
-            this.cb_redaktor.Location = new System.Drawing.Point(400, 464);
+            this.cb_redaktor.Location = new System.Drawing.Point(400, 520);
             this.cb_redaktor.Name = "cb_redaktor";
             this.cb_redaktor.Size = new System.Drawing.Size(200, 24);
-            this.cb_redaktor.TabIndex = 13;
+            this.cb_redaktor.TabIndex = 15;
             // 
             // INFO_TOOL_TIP
             // 
@@ -487,21 +521,47 @@ namespace SPM_Worker
             this.buttonSave.ForeColor = System.Drawing.Color.Green;
             this.buttonSave.Image = global::SPM_Worker.Properties.Resources.Load;
             this.buttonSave.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.buttonSave.Location = new System.Drawing.Point(606, 453);
+            this.buttonSave.Location = new System.Drawing.Point(606, 509);
             this.buttonSave.Margin = new System.Windows.Forms.Padding(0);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(116, 44);
-            this.buttonSave.TabIndex = 14;
+            this.buttonSave.TabIndex = 16;
             this.buttonSave.Text = "OK";
             this.buttonSave.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonSave.UseVisualStyleBackColor = false;
             this.buttonSave.MouseEnter += new System.EventHandler(this.buttonSave_MouseEnter);
             // 
+            // pereoblInterface1
+            // 
+            this.pereoblInterface1.AutoSize = true;
+            this.pereoblInterface1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pereoblInterface1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.pereoblInterface1.Location = new System.Drawing.Point(3, 3);
+            this.pereoblInterface1.Margin = new System.Windows.Forms.Padding(4);
+            this.pereoblInterface1.Name = "pereoblInterface1";
+            this.pereoblInterface1.Size = new System.Drawing.Size(712, 276);
+            this.pereoblInterface1.TabIndex = 0;
+            this.pereoblInterface1.TabStop = false;
+            // 
+            // soldInterface1
+            // 
+            this.soldInterface1.ATR = 0;
+            this.soldInterface1.AutoSize = true;
+            this.soldInterface1.BackColor = System.Drawing.Color.Transparent;
+            this.soldInterface1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.soldInterface1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.soldInterface1.LayoutMode = SPM_Worker.SoldInterface.ControlLayoutMode.Default;
+            this.soldInterface1.Location = new System.Drawing.Point(0, 0);
+            this.soldInterface1.Margin = new System.Windows.Forms.Padding(4);
+            this.soldInterface1.Name = "soldInterface1";
+            this.soldInterface1.Size = new System.Drawing.Size(718, 282);
+            this.soldInterface1.TabIndex = 0;
+            // 
             // ZAKAZ_FORM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(726, 502);
+            this.ClientSize = new System.Drawing.Size(726, 558);
             this.Controls.Add(this.cb_redaktor);
             this.Controls.Add(this.cb_worker);
             this.Controls.Add(this.buttonSave);
@@ -545,7 +605,7 @@ namespace SPM_Worker
         private System.Windows.Forms.TextBox tb_discount;
         private System.Windows.Forms.TextBox tb_ttnout;
         private System.Windows.Forms.TextBox tb_ttnin;
-        private System.Windows.Forms.TextBox tb_name;
+        private System.Windows.Forms.TextBox tb_name1;
         private System.Windows.Forms.TextBox tb_phone;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox tb_comm;
@@ -567,5 +627,9 @@ namespace SPM_Worker
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox tb_reqv;
         private System.Windows.Forms.Button buttonSave;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox tb_name2;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox tb_name3;
     }
 }

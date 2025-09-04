@@ -12,6 +12,8 @@ namespace SPM_Worker
         {
             InitializeComponent();
 
+            dateTimeIn.MaxDate = DateTime.Now;
+
             soldInterface1.SET(null, 0, true);
 
             tableJurnal.CellPainting += (s, e) =>
@@ -273,7 +275,7 @@ namespace SPM_Worker
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                 new MessButText { Yes = "Зберегти", No = "Редагувати" }))
             {
-                _OUT.Date = DateTime.Now;
+                _OUT.Date = dateTimeIn.Value;
                 _OUT.token = SERVICE_INFO.TOKEN;
 
                 if (SERVICE_INFO.SAVE_VITRATY(_OUT, out string message))

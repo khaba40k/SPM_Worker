@@ -10,18 +10,21 @@ namespace SPM_Worker
 {
     public partial class ZAKAZ_FORM : Form
     {
-        private bool HIDDEN_TOP = false;
+        //private bool HIDDEN_TOP = false;
 
-        private int PANEL_TOP_HEIGHT, PANEL_BOTTOM_HEIGHT, PANEL_DIFF;
+        //private int PANEL_TOP_HEIGHT, PANEL_BOTTOM_HEIGHT, PANEL_DIFF;
 
         private TabPage HIDDEN_TAB;
 
         public ZAKAZ INFO { get; private set; }
 
         public bool CHANGED { get; private set; } = false;
+        public bool TO_PRINT_FROM_WORKER = false;
 
         private string DISCOUNT_CODE = null;
         private byte? DISCOUNT_PERCENT = null;
+
+        private bool TTN_IN_ON_INPUT = false;
 
         private event EventHandler<byte> DiscountChanged;
 
@@ -36,10 +39,12 @@ namespace SPM_Worker
             if (_input == null)
             {
                 selectedLogin = SERVICE_INFO.AUTORIZE_INFO.data.LOGIN;
+                TTN_IN_ON_INPUT = false;
             }
             else
             {
                 INFO = _input;
+                TTN_IN_ON_INPUT = !string.IsNullOrWhiteSpace(_input.TTN_IN);
                 selectedLogin = _input.REDAKTOR;
             }
             
@@ -58,26 +63,34 @@ namespace SPM_Worker
                 }
             }
 
-            PANEL_TOP_HEIGHT = panel1.Height;
-            PANEL_BOTTOM_HEIGHT = panel2.Height;
-            PANEL_DIFF = 25;
+            //PANEL_TOP_HEIGHT = panel1.Height;
+            //PANEL_BOTTOM_HEIGHT = panel2.Height;
+            //PANEL_DIFF = 25;
 
             pereoblInterface1.CHANGED += INIT_TAB;
             soldInterface1.CHANGED += INIT_TAB;
 
-            HookMouseEnterAll();
-            SetupDynamicHandlers();
+            //HookMouseEnterAll();
+            //SetupDynamicHandlers();
 
-            panel1.MouseEnter += (s, e) => {
-                if (!HIDDEN_TOP) return;
+            //panel1.MouseEnter += (s, e) => {
+            //    if (!HIDDEN_TOP) return;
 
-                panel1.Height = PANEL_TOP_HEIGHT;
-                panel2.Height = PANEL_BOTTOM_HEIGHT;
+            //    panel1.Height = PANEL_TOP_HEIGHT;
+            //    panel2.Height = PANEL_BOTTOM_HEIGHT;
 
-                panel1.BackColor = SystemColors.Control;
+            //    panel1.BackColor = SystemColors.Control;
 
-                HIDDEN_TOP = false;
-            };
+            //    HIDDEN_TOP = false;
+            //};
+
+            tb_name1.TextChanged += Tb_name_TextChanged;
+            tb_name2.TextChanged += Tb_name_TextChanged;
+            tb_name3.TextChanged += Tb_name_TextChanged;
+
+            tb_name1.Leave += Tb_name_Leave;
+            tb_name2.Leave += Tb_name_Leave;
+            tb_name3.Leave += Tb_name_Leave;
 
             buttonSave.Click += (s, e) => {
 
@@ -118,7 +131,10 @@ namespace SPM_Worker
                     "Статус",
                     MessageBoxIcon.Information);
 
+                    INFO = new ZAKAZ(OUT);
+
                     CHANGED = true;
+                    TO_PRINT_FROM_WORKER = !TTN_IN_ON_INPUT && !string.IsNullOrWhiteSpace(OUT.TTN_IN);
                     Close();
                 }
                 else
@@ -148,7 +164,6 @@ namespace SPM_Worker
                             _outTerm.COST = _outTerm.GetDeffaultCost();
                         }
                     }
-
 
                     pereoblInterface1.Add(_outTerm);
                     soldInterface1.Add(_outTerm);
@@ -196,7 +211,12 @@ namespace SPM_Worker
                 tb_phone.Text = INFO.PHONE;
                 tb_phone.Select(tb_phone.Text.Length, 0);
 
-                tb_name.Text = INFO.CLIENT_NAME;
+                string[] clientNames = INFO.CLIENT_NAME.Split(new char[1] { ' ' }, 3, StringSplitOptions.RemoveEmptyEntries);
+
+                tb_name1.Text = clientNames[0];
+                tb_name2.Text = clientNames.Length > 1 ? clientNames[1] : "";
+                tb_name3.Text = clientNames.Length > 2 ? clientNames[2] : "";
+
                 tb_ttnin.Text = INFO.TTN_IN;
                 tb_ttnout.Text = INFO.TTN_OUT;
 
@@ -361,6 +381,36 @@ namespace SPM_Worker
             FormClosed += (s, e) => { SERVICE_INFO.ResetCountCost(); };
         }
 
+        private void Tb_name_Leave(object sender, EventArgs e)
+        {
+            TextBox _tb = sender as TextBox;
+
+            _tb.Text = ToUpperFirstLowerRest(_tb.Text);
+        }
+
+        private void Tb_name_TextChanged(object sender, EventArgs e)
+        {
+            TextBox _sender = sender as TextBox;
+
+            if (_sender.Text != _sender.Text.TrimEnd())
+            {
+                SelectNextControl(_sender, true, true, true, true);
+            }
+        }
+
+        public static string ToUpperFirstLowerRest(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            input = input.Trim();
+
+            if (input.Length == 1)
+                return input.ToUpper();
+
+            return char.ToUpper(input[0]) + input.Substring(1).ToLower();
+        }
+
         private void INIT_TAB(object sender, EventArgs e)
         {
             if (INFO.TYPE == Z_TYPE.NULL 
@@ -456,13 +506,21 @@ namespace SPM_Worker
             #region requaired
 
             ANSWER.PHONE = NullIfEmpty(tb_phone.Text);
-            ANSWER.CLIENT_NAME = NullIfEmpty(tb_name.Text);
+
+            ANSWER.CLIENT_NAME = NullIfEmpty(string.Join(
+                " ",
+                tb_name1.Text.Trim(),
+                tb_name2.Text.Trim(),
+                tb_name3.Text.Trim()
+                ));
+
             ANSWER.REQV = NullIfEmpty(tb_reqv.Text);
             ANSWER.REDAKTOR = NullIfEmpty(cb_redaktor.Text);
 
-            if (ANSWER.CLIENT_NAME == null)
+            if (string.IsNullOrWhiteSpace(tb_name1.Text) 
+                || string.IsNullOrWhiteSpace(tb_name2.Text))
             {
-                message += $"{counter++}) Ім'я клієнта.\n";
+                message += $"{counter++}) Ім'я/Прізвище клієнта.\n";
             }
 
             if (ANSWER.PHONE == null)
@@ -505,7 +563,7 @@ namespace SPM_Worker
 
             ANSWER.KOMPLEKT.AddRange(GetKomplekt());
 
-            return message == string.Empty;
+            return string.IsNullOrWhiteSpace(message);
         }
 
         private List<KOMPLEKT> GetKomplekt()
@@ -537,46 +595,46 @@ namespace SPM_Worker
             return string.IsNullOrWhiteSpace(_text) ? null : _text.Trim();
         }
 
-        private void MouseEnterBottom(object sender, EventArgs e)
-        {
-            if (HIDDEN_TOP) return;
+        //private void MouseEnterBottom(object sender, EventArgs e)
+        //{
+        //    if (HIDDEN_TOP) return;
 
-            panel1.Height = PANEL_DIFF;
+        //    panel1.Height = PANEL_DIFF;
 
-            panel2.Height += (PANEL_TOP_HEIGHT - PANEL_DIFF);
+        //    panel2.Height += (PANEL_TOP_HEIGHT - PANEL_DIFF);
 
-            panel1.BackColor = SystemColors.ControlDarkDark;
+        //    panel1.BackColor = SystemColors.ControlDarkDark;
 
-            HIDDEN_TOP = true;
-        }
+        //    HIDDEN_TOP = true;
+        //}
 
-        private void AddMouseEnterRecursive(Control ctrl)
-        {
-            ctrl.MouseEnter += MouseEnterBottom;
+        //private void AddMouseEnterRecursive(Control ctrl)
+        //{
+        //    ctrl.MouseEnter += MouseEnterBottom;
 
-            foreach (Control child in ctrl.Controls)
-            {
-                AddMouseEnterRecursive(child);
-            }
-        }
+        //    foreach (Control child in ctrl.Controls)
+        //    {
+        //        AddMouseEnterRecursive(child);
+        //    }
+        //}
 
-        private void HookMouseEnterAll()
-        {
-            // Підключаємо на всі вкладки
-            foreach (TabPage tab in tabControl1.TabPages)
-            {
-                AddMouseEnterRecursive(tab);
-            }
-        }
+        //private void HookMouseEnterAll()
+        //{
+        //    // Підключаємо на всі вкладки
+        //    foreach (TabPage tab in tabControl1.TabPages)
+        //    {
+        //        AddMouseEnterRecursive(tab);
+        //    }
+        //}
 
-        private void SetupDynamicHandlers()
-        {
-            tab0.ControlAdded += Tab_ControlAdded;
-            tab1.ControlAdded += Tab_ControlAdded;
+        //private void SetupDynamicHandlers()
+        //{
+        //    tab0.ControlAdded += Tab_ControlAdded;
+        //    tab1.ControlAdded += Tab_ControlAdded;
 
-            pereoblInterface1.ControlAdded += Tab_ControlAdded;
-            soldInterface1.ControlAdded += Tab_ControlAdded;
-        }
+        //    pereoblInterface1.ControlAdded += Tab_ControlAdded;
+        //    soldInterface1.ControlAdded += Tab_ControlAdded;
+        //}
 
         private void butGetNpList_Click(object sender, EventArgs e)
         {
@@ -622,9 +680,9 @@ namespace SPM_Worker
             INFO_TOOL_TIP.SetToolTip((Button)sender, _showKomplekt.ToString());
         }
 
-        private void Tab_ControlAdded(object sender, ControlEventArgs e)
-        {
-            AddMouseEnterRecursive(e.Control);
-        }
+        //private void Tab_ControlAdded(object sender, ControlEventArgs e)
+        //{
+        //    AddMouseEnterRecursive(e.Control);
+        //}
     }
 }

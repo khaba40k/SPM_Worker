@@ -29,14 +29,15 @@ namespace SPM_Worker
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabWrite = new System.Windows.Forms.TabPage();
+            this.butSave = new System.Windows.Forms.Button();
             this.soldInterface1 = new SPM_Worker.SoldInterface();
             this.tabJurnal = new System.Windows.Forms.TabPage();
             this.tableJurnal = new System.Windows.Forms.DataGridView();
@@ -48,7 +49,7 @@ namespace SPM_Worker
             this.cellComm = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cellDel = new System.Windows.Forms.DataGridViewButtonColumn();
             this.datetimeJurnal = new System.Windows.Forms.DateTimePicker();
-            this.butSave = new System.Windows.Forms.Button();
+            this.dateTimeIn = new System.Windows.Forms.DateTimePicker();
             this.tabControl1.SuspendLayout();
             this.tabWrite.SuspendLayout();
             this.tabJurnal.SuspendLayout();
@@ -73,6 +74,7 @@ namespace SPM_Worker
             // 
             this.tabWrite.BackColor = System.Drawing.Color.WhiteSmoke;
             this.tabWrite.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabWrite.Controls.Add(this.dateTimeIn);
             this.tabWrite.Controls.Add(this.butSave);
             this.tabWrite.Controls.Add(this.soldInterface1);
             this.tabWrite.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -82,6 +84,22 @@ namespace SPM_Worker
             this.tabWrite.Size = new System.Drawing.Size(563, 392);
             this.tabWrite.TabIndex = 1;
             this.tabWrite.Text = "РЕДАГУВАННЯ";
+            // 
+            // butSave
+            // 
+            this.butSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.butSave.BackColor = System.Drawing.Color.Green;
+            this.butSave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.butSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.butSave.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.butSave.Location = new System.Drawing.Point(415, 353);
+            this.butSave.Margin = new System.Windows.Forms.Padding(0);
+            this.butSave.Name = "butSave";
+            this.butSave.Size = new System.Drawing.Size(140, 30);
+            this.butSave.TabIndex = 0;
+            this.butSave.Text = "ЗБЕРЕГТИ";
+            this.butSave.UseVisualStyleBackColor = false;
+            this.butSave.Click += new System.EventHandler(this.butSave_Click);
             // 
             // soldInterface1
             // 
@@ -161,9 +179,9 @@ namespace SPM_Worker
             // 
             // cellServiceNameType
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.cellServiceNameType.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.cellServiceNameType.DefaultCellStyle = dataGridViewCellStyle7;
             this.cellServiceNameType.HeaderText = "Назва";
             this.cellServiceNameType.MaxInputLength = 100;
             this.cellServiceNameType.MinimumWidth = 30;
@@ -173,10 +191,10 @@ namespace SPM_Worker
             // cellColor
             // 
             this.cellColor.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.NullValue = "-";
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.cellColor.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.NullValue = "-";
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.cellColor.DefaultCellStyle = dataGridViewCellStyle8;
             this.cellColor.HeaderText = "Колір";
             this.cellColor.MaxInputLength = 15;
             this.cellColor.MinimumWidth = 15;
@@ -187,11 +205,11 @@ namespace SPM_Worker
             // cellCount
             // 
             this.cellCount.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.Format = "0 шт";
-            dataGridViewCellStyle3.NullValue = "-";
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.cellCount.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle9.Format = "0 шт";
+            dataGridViewCellStyle9.NullValue = "-";
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.cellCount.DefaultCellStyle = dataGridViewCellStyle9;
             this.cellCount.FillWeight = 53.96825F;
             this.cellCount.HeaderText = "К-ть";
             this.cellCount.MaxInputLength = 4;
@@ -203,11 +221,11 @@ namespace SPM_Worker
             // cellCost
             // 
             this.cellCost.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle4.Format = "N2";
-            dataGridViewCellStyle4.NullValue = "-";
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.cellCost.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle10.Format = "N2";
+            dataGridViewCellStyle10.NullValue = "-";
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.cellCost.DefaultCellStyle = dataGridViewCellStyle10;
             this.cellCost.FillWeight = 53.96825F;
             this.cellCost.HeaderText = "Ціна";
             this.cellCost.MaxInputLength = 15;
@@ -218,9 +236,9 @@ namespace SPM_Worker
             // 
             // cellComm
             // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.cellComm.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.cellComm.DefaultCellStyle = dataGridViewCellStyle11;
             this.cellComm.FillWeight = 53.96825F;
             this.cellComm.HeaderText = "Коментар";
             this.cellComm.MaxInputLength = 500;
@@ -231,13 +249,13 @@ namespace SPM_Worker
             // cellDel
             // 
             this.cellDel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle6.BackColor = System.Drawing.Color.Red;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.Yellow;
-            dataGridViewCellStyle6.NullValue = "X";
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.cellDel.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.BackColor = System.Drawing.Color.Red;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.Color.Yellow;
+            dataGridViewCellStyle12.NullValue = "X";
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.cellDel.DefaultCellStyle = dataGridViewCellStyle12;
             this.cellDel.FillWeight = 20F;
             this.cellDel.HeaderText = "Видалити";
             this.cellDel.MinimumWidth = 20;
@@ -261,21 +279,18 @@ namespace SPM_Worker
             this.datetimeJurnal.TabIndex = 1;
             this.datetimeJurnal.ValueChanged += new System.EventHandler(this.datetimeJurnal_ValueChanged);
             // 
-            // butSave
+            // dateTimeIn
             // 
-            this.butSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.butSave.BackColor = System.Drawing.Color.Green;
-            this.butSave.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.butSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.butSave.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.butSave.Location = new System.Drawing.Point(415, 353);
-            this.butSave.Margin = new System.Windows.Forms.Padding(0);
-            this.butSave.Name = "butSave";
-            this.butSave.Size = new System.Drawing.Size(140, 30);
-            this.butSave.TabIndex = 0;
-            this.butSave.Text = "ЗБЕРЕГТИ";
-            this.butSave.UseVisualStyleBackColor = false;
-            this.butSave.Click += new System.EventHandler(this.butSave_Click);
+            this.dateTimeIn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.dateTimeIn.CustomFormat = " dd.MM.yyyyр. [HH:mm]";
+            this.dateTimeIn.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimeIn.Location = new System.Drawing.Point(3, 353);
+            this.dateTimeIn.MinDate = new System.DateTime(2023, 10, 1, 0, 0, 0, 0);
+            this.dateTimeIn.Name = "dateTimeIn";
+            this.dateTimeIn.ShowUpDown = true;
+            this.dateTimeIn.Size = new System.Drawing.Size(271, 30);
+            this.dateTimeIn.TabIndex = 2;
+            this.dateTimeIn.TabStop = false;
             // 
             // Vitraty
             // 
@@ -317,5 +332,6 @@ namespace SPM_Worker
         private System.Windows.Forms.DataGridViewButtonColumn cellDel;
         private SoldInterface soldInterface1;
         private System.Windows.Forms.Button butSave;
+        private System.Windows.Forms.DateTimePicker dateTimeIn;
     }
 }

@@ -26,7 +26,7 @@ namespace SPM_Worker
 
             InitializeComponent();
 
-            Text = $"SholomProMax Користувач: [{_autorizeinfo.data.NAME.ToUpper()}]";
+            Text = $"SholomProMax v{Application.ProductVersion} Користувач: [{_autorizeinfo.data.NAME.ToUpper()}]";
 
             panelMenu.ControlAdded += (s, e) => {
                 Button _btn = (Button)e.Control;

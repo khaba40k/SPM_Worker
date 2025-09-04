@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>SPM_Worker</RootNamespace>
     <AssemblyName>SPM_Worker</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
@@ -72,7 +72,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>SPM_Worker.Program</StartupObject>
@@ -84,7 +84,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>SPM_Cert.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>SPM_VS_2022_cert.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPPlus">
@@ -250,8 +250,7 @@
       <DependentUpon>ZAKAZ_FORM.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="SPM_Cert.pfx" />
-    <None Include="SPM_Worker_TemporaryKey.pfx" />
+    <None Include="SPM_VS_2022_cert.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
