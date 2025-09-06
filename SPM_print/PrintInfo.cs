@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BarcodeLib;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -41,9 +42,10 @@ namespace SPM_print
 
             // Показуємо прев’ю
             PreviewForm _preview = new PreviewForm(_allPages);
+
             if (DialogResult.OK == _preview.ShowDialog())
             {
-                _currentIndex = 0;   // обнуляємо перед друком
+                _currentIndex = 0;
                 try
                 {
                     pd.Print();
@@ -60,14 +62,57 @@ namespace SPM_print
             Size a4 = new Size(2480, 3508);
 
             Bitmap bmp = new Bitmap(a4.Width / 2, a4.Height / 4);
+
             using (Graphics g = Graphics.FromImage(bmp))
             {
+                g.Clear(Color.White);
+
+                const int TABLE_WIDTH = 1190;
+
+                int LEFT_PADDING = 0;
+
+                if (!WithKomplekt && Z.TTN_OUT != null && Z.TTN_OUT.Length == 14)
+                {
+                    LEFT_PADDING = 150;
+
+                    Barcode barcode = new Barcode
+                    {
+                        IncludeLabel = false // цифри під штрихкодом
+                    };
+
+                    Image barcodeImg = barcode.Encode(TYPE.CODE128, Z.TTN_OUT, Color.Black, Color.White, 350, 120);
+
+                    Bitmap barcodeBmp = new Bitmap(barcodeImg.Height, barcodeImg.Width + 45);//, System.Drawing.Imaging.PixelFormat.Format24bppRgb
+
+                    using (Graphics bar = Graphics.FromImage(barcodeBmp))
+                    {
+                        bar.Clear(Color.White);
+
+                        bar.TranslateTransform(0, 0);
+
+                        bar.RotateTransform(90);
+
+                        bar.DrawImage(barcodeImg, 0, -barcodeImg.Height);
+
+                        bar.RotateTransform(-90);
+
+                        bar.DrawString(
+                            Z.TTN_OUT.Substring(Z.TTN_OUT.Length - 4), 
+                            new Font(fontFamily, 36, FontStyle.Bold), 
+                            new SolidBrush(Color.Black),
+                            0,
+                            barcodeImg.Width + 1);
+                    }
+
+                    g.DrawImage(barcodeBmp, 40, 30);
+                }
+
+                int TOTAL_TABLE_WIDTH = TABLE_WIDTH - LEFT_PADDING;
+
                 Font _fontBold = new Font(fontFamily, fontSize, FontStyle.Bold);
                 Font _fontRegular = new Font(fontFamily, fontSize, FontStyle.Regular);
 
-                g.Clear(Color.White);
-
-                int[] cellWidth = new int[2] { 350, 840 }; //1190
+                int[] cellWidth = GetCellWidth(TOTAL_TABLE_WIDTH, 30); //1190
 
                 string text = $"ІНФОРМАЦІЯ ПО {(Z.TYPE == 0 ? "ШОЛОМУ" : "ЗАМОВЛЕННЮ")}" +
                      $"{(!string.IsNullOrEmpty(Z.NUMBER) && Z.NUMBER != "0" ? $" №{Z.NUMBER}" : "")}";
@@ -83,12 +128,12 @@ namespace SPM_print
 
                 g.DrawString(text, _fontBold, Brushes.Black, leftX, topY);
 
-                leftX = 25;
+                leftX = LEFT_PADDING + 25; //25
 
                 string[] cellText = new string[4];
 
                 //Дата / Термін
-                cellWidth = new int[3] { 350, 420, 420 };
+                cellWidth = GetCellWidth(TOTAL_TABLE_WIDTH, 30, 35);
                 cellText[0] = "Дата / Термін";
                 cellText[1] = Z.DATE_IN;
                 cellText[2] = Z.DATE_MAX;
@@ -102,7 +147,8 @@ namespace SPM_print
                     rowHeigthFact, cellText[1], _fontRegular, StringAlignment.Center);
                 DrawCell(g, NextCellPosition(leftX, 2, cellWidth), topY, width: cellWidth[1],
                     rowHeigthFact, cellText[2], _fontRegular, StringAlignment.Center);
-                cellWidth = new int[2] { 350, 840 };
+
+                cellWidth = GetCellWidth(TOTAL_TABLE_WIDTH, 30);
 
                 //Дата відправки
 
@@ -160,7 +206,7 @@ namespace SPM_print
                 //ТТН
                 if (!string.IsNullOrEmpty(Z.TTN_IN) || !string.IsNullOrEmpty(Z.TTN_OUT))
                 {
-                    cellWidth = new int[3] { 350, 420, 420 };
+                    cellWidth = GetCellWidth(TOTAL_TABLE_WIDTH, 30, 35);
 
                     cellText[0] = "ТТН вх./вих.";
                     cellText[1] = Z.TTN_IN;
@@ -176,7 +222,7 @@ namespace SPM_print
                     DrawCell(g, NextCellPosition(leftX, 2, cellWidth), topY, width: cellWidth[1],
                         rowHeigthFact, cellText[2], _fontRegular, StringAlignment.Center);
 
-                    cellWidth = new int[2] { 350, 840 };
+                    cellWidth = GetCellWidth(TOTAL_TABLE_WIDTH, 30);
                 }
 
                 //Врахована знижка
@@ -221,7 +267,7 @@ namespace SPM_print
                     }
 
                     //Сервіси
-                    cellWidth = new int[] { 770, 70, 210, 140 }; //1190
+                    cellWidth = GetCellWidth(TOTAL_TABLE_WIDTH, 65, 6, 18);
 
                     Z.SERVICES.Sort((x, y) => x.ORDER.CompareTo(y.ORDER));
 
@@ -263,7 +309,7 @@ namespace SPM_print
                 }
 
                 //ДО СПЛАТИ 2
-                cellWidth = new int[] { 770, 420 }; //1190
+                cellWidth = GetCellWidth(TOTAL_TABLE_WIDTH, 65);
 
                 cellText[0] = "ДО СПЛАТИ";
                 cellText[1] = Z.SUM;
@@ -475,6 +521,26 @@ namespace SPM_print
             return bmp;
         }
 
+
+        private static int[] GetCellWidth(int total, params int[] percents)
+        {
+            int total_percents = 0;
+
+            List<int> _out = new List<int>();
+
+            foreach (int perc in percents) {
+                total_percents += perc;
+
+                _out.Add((total * perc) / 100);
+            }
+
+            if (total_percents < 100)
+            {
+                _out.Add(total - _out.Sum());
+            }
+
+            return _out.ToArray();
+        }
 
         private static int NextCellPosition(int prew, int index, int[] _arr)
         {

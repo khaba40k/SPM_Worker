@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using API_NovaPoshta;
+using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SPM_Core;
 using SPM_Worker.Properties;
@@ -466,6 +467,22 @@ namespace SPM_Worker
             Vitraty _vitr = new Vitraty();
 
             panelContent.Controls.Add(_vitr);
+        }
+
+        private void tESTToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NovaPoshta NP = new NovaPoshta("4c0e5cf1a2509ca7880c979a68b986a8",
+                Path.Combine(Environment
+                .GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "spm", "NP")
+            );
+
+            CreateDocumentParams _params = new CreateDocumentParams("4c0e5cf1a2509ca7880c979a68b986a8");
+
+            _params.OptionsSeat.Add(new OptionsSeat { Height=10, Length=10, Width=10 });
+            _params.OptionsSeat.Add(new OptionsSeat { Height = 20, Length = 20, Width = 20 });
+
+            MessageBox.Show(NP.TEST(_params));
         }
     }
 

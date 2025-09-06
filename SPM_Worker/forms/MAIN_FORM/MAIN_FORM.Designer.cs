@@ -35,6 +35,7 @@ namespace SPM_Worker
             this.saveCSVhistory = new System.Windows.Forms.ToolStripMenuItem();
             this.panelContent = new System.Windows.Forms.Panel();
             this.panelMenu = new System.Windows.Forms.FlowLayoutPanel();
+            this.tESTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MENU_CONTEXT.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -42,10 +43,11 @@ namespace SPM_Worker
             // 
             this.MENU_CONTEXT.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.MENU_CONTEXT.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mcFile});
+            this.mcFile,
+            this.tESTToolStripMenuItem});
             this.MENU_CONTEXT.Location = new System.Drawing.Point(0, 0);
             this.MENU_CONTEXT.Name = "MENU_CONTEXT";
-            this.MENU_CONTEXT.Size = new System.Drawing.Size(982, 30);
+            this.MENU_CONTEXT.Size = new System.Drawing.Size(982, 28);
             this.MENU_CONTEXT.TabIndex = 2;
             // 
             // mcFile
@@ -53,7 +55,7 @@ namespace SPM_Worker
             this.mcFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveCSVhistory});
             this.mcFile.Name = "mcFile";
-            this.mcFile.Size = new System.Drawing.Size(59, 26);
+            this.mcFile.Size = new System.Drawing.Size(59, 24);
             this.mcFile.Text = "Файл";
             // 
             // saveCSVhistory
@@ -83,11 +85,18 @@ namespace SPM_Worker
             this.panelMenu.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelMenu.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.panelMenu.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.panelMenu.Location = new System.Drawing.Point(0, 30);
+            this.panelMenu.Location = new System.Drawing.Point(0, 28);
             this.panelMenu.Name = "panelMenu";
-            this.panelMenu.Size = new System.Drawing.Size(179, 523);
+            this.panelMenu.Size = new System.Drawing.Size(179, 525);
             this.panelMenu.TabIndex = 4;
             this.panelMenu.WrapContents = false;
+            // 
+            // tESTToolStripMenuItem
+            // 
+            this.tESTToolStripMenuItem.Name = "tESTToolStripMenuItem";
+            this.tESTToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
+            this.tESTToolStripMenuItem.Text = "TEST";
+            this.tESTToolStripMenuItem.Click += new System.EventHandler(this.tESTToolStripMenuItem_Click);
             // 
             // MAIN_FORM
             // 
@@ -117,5 +126,6 @@ namespace SPM_Worker
         private System.Windows.Forms.Panel panelContent;
         private System.Windows.Forms.FlowLayoutPanel panelMenu;
         private System.Windows.Forms.ToolStripMenuItem saveCSVhistory;
+        private System.Windows.Forms.ToolStripMenuItem tESTToolStripMenuItem;
     }
 }

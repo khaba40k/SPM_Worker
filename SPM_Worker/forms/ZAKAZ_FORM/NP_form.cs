@@ -34,7 +34,7 @@ namespace SPM_Worker
         private List<NP_Descr_Ref> _CurrentAreas = new List<NP_Descr_Ref>();
 
         private NovaPoshta NOVA_POSHTA = new NovaPoshta(
-            "4e4de3b4d068a37e30e0da387a049415",
+            "4c0e5cf1a2509ca7880c979a68b986a8",
             Path.Combine(new string[3] {
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "spm",

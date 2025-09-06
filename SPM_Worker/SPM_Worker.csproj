@@ -443,6 +443,18 @@
     <Error Condition="!Exists('packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
     <Error Condition="!Exists('packages\WinSCP.6.5.3\build\WinSCP.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\WinSCP.6.5.3\build\WinSCP.targets'))" />
   </Target>
+  <Target Name="CopyProjectReferencesLocal" AfterTargets="Build">
+  <ItemGroup>
+    <ProjectReferencesOutput Include="@(ProjectReference->'%(FullPath)')"/>
+  </ItemGroup>
+
+  <Message Text="Copying references for: @(ProjectReferencesOutput)" Importance="high" />
+
+  <Copy 
+    SourceFiles="@(ReferenceCopyLocalPaths)" 
+    DestinationFolder="$(OutDir)" 
+    SkipUnchangedFiles="true" />
+  </Target>
   <Import Project="packages\WinSCP.6.5.3\build\WinSCP.targets" Condition="Exists('packages\WinSCP.6.5.3\build\WinSCP.targets')" />
   <PropertyGroup>
     <PostBuildEvent>

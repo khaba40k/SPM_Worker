@@ -1,11 +1,11 @@
-﻿using System.Web.Script.Serialization;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System;
-using Newtonsoft.Json;
+using System.Web.Script.Serialization;
 
 namespace API_NovaPoshta
 {
@@ -416,11 +416,7 @@ namespace API_NovaPoshta
             return _daysToUpdate > 0 ? Is_Actual(_fileName, _daysToUpdate) : true;
         }
 
-
-        private bool Is_Exist(string fileName)
-        {
-            return File.Exists(Path.Combine(CASH_PATH, fileName));
-        }
+        private bool Is_Exist(string fileName) => File.Exists(Path.Combine(CASH_PATH, fileName));
 
         private bool Is_Actual(string fileFullPath, byte days)
         {
@@ -431,10 +427,49 @@ namespace API_NovaPoshta
             return (DateTime.Now - lastWrite).TotalHours <= (24 * days);
         }
 
-        public void Dispose()
+        public CreateContactJsonAnswer CreateRecepient(string phone, string FirstName, string LastName, string MiddleName = "")
         {
-            WEB_CLIENT?.Dispose();
+            WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json";
+
+            try
+            {
+                string jsonRequest = $@"{{
+                    ""apiKey"": ""{TOKEN}"",
+                    ""modelName"": ""Counterparty"",
+                    ""calledMethod"": ""save"",
+                    ""methodProperties"": {{
+                        ""CounterpartyProperty"": ""Recipient"",
+                        ""CounterpartyType"": ""PrivatePerson"",
+                        ""FirstName"": ""{FirstName}"",
+                        ""MiddleName"": ""{MiddleName}"",
+                        ""LastName"": ""{LastName}"",
+                        ""Phone"": ""{phone}""
+                    }}
+                }}";
+
+                string response = WEB_CLIENT.UploadString(API_URL, "POST", jsonRequest);
+                return SERIALIZER.Deserialize<CreateContactJsonAnswer>(response);
+                
+            }
+            catch {
+                return null;
+            }
         }
+
+        public List<CreatedDocumentInfo> CreateDocument(CreateDocumentParams _input)
+        {
+
+            
+
+            return null;
+        }
+
+        public string TEST(CreateDocumentParams _input)
+        {
+            return _input.ToString();
+        }
+
+        public void Dispose() => WEB_CLIENT?.Dispose();
     }
 
     public class AddressParts
@@ -810,4 +845,137 @@ namespace API_NovaPoshta
 
     }
 
+    public class CreateDocumentParams
+    {
+        private string TOKEN { get; set; }
+
+        public CreateDocumentParams(string token)
+        {
+            TOKEN = token;
+        }
+
+        public string PayerType { get; set; } = "Recipient";
+        public string PaymentMethod { get; set; } = "Cash";
+        public string CargoType { get; set; } = "Parcel";
+        public byte SeatsAmount => (byte)OptionsSeat.Count;
+        public List<OptionsSeat> OptionsSeat { get; set; } = new List<OptionsSeat>();
+        public float Weight { get; set; }
+        public float TotalSeatsWeigth => OptionsSeat.Sum(op => op.weigth);
+        public string ServiceType { get; set; } = "WarehouseWarehouse";
+        public string Description { get; set; } = "Шолом";
+        public float Cost { get; set; }
+        public float AfterpaymentOnGoodsCost { get; set; }
+        public DateTime DateTime { get; set; } = DateTime.Now;
+        public string CitySender { get; set; } = "db5c88dc-391c-11dd-90d9-001a92567626";
+        public string Sender { get; set; } = "491b82bf-8982-11f0-a1d5-48df37b921da";
+        public string ContactSender { get; set; } = "b8a4a84d-8983-11f0-a1d5-48df37b921da";
+        public string SenderAddress { get; set; } = "8b06dbb3-0ac5-11e5-8a92-005056887b8d";
+        public string SendersPhone { get; set; } = "380953410218";
+
+        private string CityRecipient { get; set; }
+        private string RecipientAddress { get; set; }
+        private string RecipientsPhone { get; set; }
+        private string Recipient {  get; set; }
+        private string ContactRecipient { get; set; }
+
+        private const string modelName = "InternetDocument";
+        private const string calledMethod = "save";
+
+        private string methodProperties()
+        {
+            return string.Join(",\n\t",
+                "\t\"PayerType\": \"" + PayerType + "\"",
+                "\"PaymentMethod\": \"" + PaymentMethod + "\"",
+                "\"CargoType\": \"" + CargoType + "\"",
+                "\"SeatsAmount\": \"" + SeatsAmount + "\"",
+                "\"Weight\": \"" + Weight + "\"",
+                "\"ServiceType\": \"" + ServiceType + "\"",
+                "\"Description\": \"" + Description + "\"",
+                "\"Cost\": \"" + Cost + "\"",
+                "\"AfterpaymentOnGoodsCost\": \"" + AfterpaymentOnGoodsCost + "\"",
+                "\"DateTime\": \"" + DateTime.ToShortDateString() + "\"",
+                "\"CitySender\": \"" + CitySender + "\"",
+                "\"Sender\": \"" + Sender + "\"",
+                "\"ContactSender\": \"" + ContactSender + "\"",
+                "\"SenderAddress\": \"" + SenderAddress + "\"",
+                "\"SendersPhone\": \"" + SendersPhone + "\"",
+                "\"CityRecipient\": \"" + CityRecipient + "\"",
+                "\"RecipientAddress\": \"" + RecipientAddress + "\"",
+                "\"RecipientsPhone\": \"" + RecipientsPhone + "\"",
+                "\"Recipient\": \"" + Recipient + "\"",
+                "\"ContactRecipient\": \"" + ContactRecipient + "\"",
+                "\"OptionsSeat\": \n\t[\n\t" + string.Join(",\n\t", OptionsSeat) + "\n\t]"
+                );
+        }
+
+        public override string ToString()
+        {
+            return "{\n" + string.Join(",\n",
+                "\"apiKey\": \"" + TOKEN + "\"",
+                "\"modelName\": \"" + modelName + "\"",
+                "\"calledMethod\": \"" + calledMethod + "\"",
+                "\"methodProperties\": \n\t{\n" + methodProperties() + "\n\t}"
+                ) + "\n}";
+        }
+    }
+
+    public class OptionsSeat
+    {
+        public byte Length { get; set; }
+        public byte Width { get; set; }
+        public byte Height { get; set; }
+        public float weigth => (Length * Width * Height) / 4000f;
+        public override string ToString()
+        {
+            return "\t{\n" + string.Join(",\n\t\t",
+                "\t\t\"volumetricLength\": " + Length,
+                "\"volumetricWidth\": " + Width,
+                "\"volumetricHeight\": " + Height
+                ) + "\n\t\t}";
+        }
+    }
+
+    public class CreateContactJsonAnswer
+    {
+        public bool success { get; set; }
+        public List<ClientCounterparty> data { get; set; }
+        public string Recipient => data?.First().Ref;
+        public string ContactRecipient => data?.First().ContactPerson?.data?.First().Ref;
+    }
+
+    public class ClientCounterparty
+    {
+        public string Ref { get; set; }
+        public ContactPersonJsonAnswer ContactPerson { get; set; }
+    }
+
+    public class ContactPersonJsonAnswer
+    {
+        public bool success { get; set; }
+        public List<ContactPerson> data { get; set; }
+    }
+
+    public class ContactPerson
+    {
+        public string Ref { get; set; }
+        public string Description { get; set; }
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+    }
+
+    public class CreateDocumentJsonAnswer
+    {
+        public bool success { get; set; }
+        public List<CreatedDocumentInfo> data { get; set; }
+    }
+
+    public class CreatedDocumentInfo
+    {
+        public string Ref { get;set; }
+        public float CostOnSite { get; set; }
+        public DateTime EstimatedDeliveryDate { get; set; }
+        public string IntDocNumber { get; set; }
+        public string TypeDocument { get; set; }
+    }
 }
