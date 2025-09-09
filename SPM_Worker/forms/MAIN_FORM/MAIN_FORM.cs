@@ -477,10 +477,13 @@ namespace SPM_Worker
                 "spm", "NP")
             );
 
-            CreateDocumentParams _params = new CreateDocumentParams("4c0e5cf1a2509ca7880c979a68b986a8");
+            string numberPhone = "0 98 599 26 89 Андрій";
+
+            CreateContactJsonAnswer _recepient = NP.CreateRecepient(ref numberPhone, "Тимошенко", "Андрій");
+
+            CreateDocumentParams _params = new CreateDocumentParams(_recepient, numberPhone);
 
             _params.OptionsSeat.Add(new OptionsSeat { Height=10, Length=10, Width=10 });
-            _params.OptionsSeat.Add(new OptionsSeat { Height = 20, Length = 20, Width = 20 });
 
             MessageBox.Show(NP.TEST(_params));
         }

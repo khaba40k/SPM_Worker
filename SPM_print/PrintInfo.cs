@@ -14,6 +14,7 @@ namespace SPM_print
         private static int _currentIndex;
         private const string fontFamily = "Arial";
         private const int fontSize = 20;
+        static string workerSplit = "!!!";
 
         public static void Print(List<PRINT_TABLE_INFO> _input, PrintType _type)
         {
@@ -447,9 +448,9 @@ namespace SPM_print
                 {
                     cellText[0] = Z.COMM.Replace("\n", " ").Replace("\r", " ");
 
-                    if (cellText[0].IndexOf("!!!") > -1)
+                    if (cellText[0].IndexOf(workerSplit) > -1)
                     {
-                        cellText[0] = cellText[0].Split(new string[1] { "!!!" }, StringSplitOptions.None)[1].Trim().ToUpper();
+                        cellText[0] = cellText[0].Split(new string[1] { workerSplit }, StringSplitOptions.None)[1].Trim().ToUpper();
                     }
 
                     if (cellText[0] != string.Empty)

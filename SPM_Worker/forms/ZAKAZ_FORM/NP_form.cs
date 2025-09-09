@@ -316,7 +316,9 @@ namespace SPM_Worker
                 List<NP_CityInfo> _filter = new List<NP_CityInfo>();
 
                 _filter = _finded.Where(f => f.Description.ToLower()
-                                 == _input.Description.ToLower()).ToList();
+                                 == _input.Description.ToLower() 
+                                 && f.SettlementType ==
+                                     _input.SettlementType).ToList();
 
                 if (_filter.Count == 0)
                 _filter = _finded.Where(f=>f.Description.ToLower()
@@ -353,15 +355,12 @@ namespace SPM_Worker
 
                         if (_filter.Count > 0) _finded = _filter;
                     }
+
                 } 
                 else if (_filter.Count == 1)
                 {
                     _finded = _filter;
                 }
-            }
-            else//Шукаємо онлайн
-            {
-
             }
 
             if (_finded.Count >= 1)
@@ -386,7 +385,8 @@ namespace SPM_Worker
 
                 foreach (NP_CityInfo item in cb_city.Items)
                 {
-                    if (item.Description == _finded[0].Description)
+                    if (item.Description == _finded[0].Description 
+                        && item.SettlementType == _finded[0].SettlementType)
                     {
                         cb_city.SelectedItem = item;
                         break;

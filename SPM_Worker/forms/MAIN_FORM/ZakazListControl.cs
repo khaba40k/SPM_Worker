@@ -158,7 +158,7 @@ namespace SPM_Worker
             {
                 using (MoveForm _form = new MoveForm(new string[] {
                             "Працівник",
-                            "ТТН (вих)",
+                            "Створити накладну",
                             "Сума (факт)"
                         }, new string[] {
                             _inf.WORKER,

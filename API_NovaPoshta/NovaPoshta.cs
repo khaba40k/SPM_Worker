@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 
@@ -21,12 +22,12 @@ namespace API_NovaPoshta
         private const byte DAYS_FROM_AREAS_OVERRIDE = 5;
 
         public bool LOCAL_CITIES_EXIST => Is_Exist(FILENAME_CITIES_CASH);
-        public bool IS_ACTUAL_LOCAL_CITIES => Is_Actual(Path.Combine(CASH_PATH, FILENAME_CITIES_CASH), 
+        public bool IS_ACTUAL_LOCAL_CITIES => Is_Actual(Path.Combine(CASH_PATH, FILENAME_CITIES_CASH),
             DAYS_FROM_CITIES_OVERRIDE);
 
         public bool IS_ACTUAL_LOCAL_AREAS_ALL => isActualAreasFiles();
 
-        private WebClient WEB_CLIENT = new WebClient();
+        private WebClient WEB_CLIENT = new WebClient() { Encoding = Encoding.UTF8 };
 
         private JavaScriptSerializer SERIALIZER = new JavaScriptSerializer();
         public NovaPoshta(string token, string cashPath)
@@ -65,7 +66,7 @@ namespace API_NovaPoshta
                     SaveToJsonFile(FILENAME_AREAS_CASH, _answer);
                 }
                 catch { return new NP_Descr_Ref[0]; }
-                
+
             }
 
             return _answer;
@@ -251,20 +252,18 @@ namespace API_NovaPoshta
         /// <param name="AreaDesc"></param>
         /// <returns></returns>
         public List<WrhInfo> GetWarehouseList(
-            string CityDesc, 
-            string TypeRef, 
+            string CityDesc,
+            string TypeRef,
             string AreaDesc)
         {
-            NP_CITIES _ans;
-
-            if (!DeSerializeIfActual(FILENAME_CITIES_CASH, out _ans, DAYS_FROM_CITIES_OVERRIDE))
+            if (!DeSerializeIfActual(FILENAME_CITIES_CASH, out NP_CITIES _ans, DAYS_FROM_CITIES_OVERRIDE))
             {
                 return null;
             }
 
             List<NP_CityInfoToWrh> _cities = _ans.data
                 .Select(i => (NP_CityInfoToWrh)i)
-                .Where(i => i.Description == CityDesc &&
+                .Where(i => i.Description.Contains(CityDesc) &&
                             i.SettlementType == TypeRef &&
                             i.AreaDescription == AreaDesc)
                 .ToList();
@@ -280,7 +279,7 @@ namespace API_NovaPoshta
                 ""apiKey"": ""{TOKEN}""
                 }}";
 
-            WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json";
+            WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
 
             try
             {
@@ -293,6 +292,32 @@ namespace API_NovaPoshta
             }
             catch { return null; }
         }
+
+        public List<WrhInfo> GetWarehouseList(string CityRef)
+        {
+            string jsonRequest = $@"{{
+                ""modelName"": ""AddressGeneral"",
+                ""calledMethod"": ""getWarehouses"",
+                ""methodProperties"": {{
+                    ""CityRef"": ""{CityRef}""
+                }},
+                ""apiKey"": ""{TOKEN}""
+                }}";
+
+            WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
+
+            try
+            {
+                string response = WEB_CLIENT.UploadString(API_URL, "POST", jsonRequest);
+                WarehouseList _warehouses = SERIALIZER.Deserialize<WarehouseList>(response);
+
+                _warehouses.data.Sort((w1, w2) => w1.NUMBER.CompareTo(w2.NUMBER));
+
+                return _warehouses.data;
+            }
+            catch { return null; }
+        }
+
         /// <summary>
         /// Після проходження всіх сторінок в getCities зберігає кеш в файл
         /// і обнуляє пам'ять. Виконується після серії GetCitiesFromWeb(page)
@@ -363,14 +388,14 @@ namespace API_NovaPoshta
                     .OrderBy(c =>
                     {
                         string desc = c.Description.ToLower();
-                    
+
                         if (desc == search)
                             return 0;  // Повне співпадіння → найвищий пріоритет
-                                    else if (desc.Contains(search))
+                        else if (desc.Contains(search))
                             return 1;  // Часткове співпадіння → середній пріоритет
-                                    else
+                        else
                             return 2;  // Відсутність → найнижчий пріоритет
-                                })
+                    })
                     // Додатково сортуємо алфавітно всередині груп
                     .ThenBy(c => c.Description, StringComparer.OrdinalIgnoreCase)
                     .ToList();
@@ -418,6 +443,14 @@ namespace API_NovaPoshta
 
         private bool Is_Exist(string fileName) => File.Exists(Path.Combine(CASH_PATH, fileName));
 
+        private string GetPrivatePersonCounterparty()
+        {
+
+
+
+            return "";
+        }
+
         private bool Is_Actual(string fileFullPath, byte days)
         {
             if (!File.Exists(fileFullPath)) return false;
@@ -427,39 +460,64 @@ namespace API_NovaPoshta
             return (DateTime.Now - lastWrite).TotalHours <= (24 * days);
         }
 
-        public CreateContactJsonAnswer CreateRecepient(string phone, string FirstName, string LastName, string MiddleName = "")
+        public CreateContactJsonAnswer CreateRecepient(
+            ref string phone,
+            string LastName,
+            string FirstName,
+            string MiddleName = "")
         {
-            WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json";
+            if (string.IsNullOrWhiteSpace(FirstName)
+                || string.IsNullOrWhiteSpace(LastName)) return null;
+
+            StringBuilder _phone = new StringBuilder();
+
+            foreach (char d in phone)
+            {
+                if (char.IsDigit(d)) _phone.Append(d);
+            }
+
+            if (_phone.Length < 10 || _phone.Length > 12) return null;
+
+            phone = _phone.ToString().PadLeft(12, 'X');
+            phone = phone.Replace("XX", "38");
+            phone = phone.Replace("X", "3");
+
+            WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
 
             try
             {
-                string jsonRequest = $@"{{
-                    ""apiKey"": ""{TOKEN}"",
-                    ""modelName"": ""Counterparty"",
-                    ""calledMethod"": ""save"",
-                    ""methodProperties"": {{
-                        ""CounterpartyProperty"": ""Recipient"",
-                        ""CounterpartyType"": ""PrivatePerson"",
-                        ""FirstName"": ""{FirstName}"",
-                        ""MiddleName"": ""{MiddleName}"",
-                        ""LastName"": ""{LastName}"",
-                        ""Phone"": ""{phone}""
-                    }}
-                }}";
+                var request = new
+                {
+                    apiKey = TOKEN,
+                    modelName = "Counterparty",
+                    calledMethod = "save",
+                    methodProperties = new
+                    {
+                        CounterpartyProperty = "Recipient",
+                        CounterpartyType = "PrivatePerson",
+                        FirstName = FirstName.Trim(),
+                        MiddleName = MiddleName.Trim(),
+                        LastName = LastName.Trim(),
+                        Phone = phone
+                    }
+                };
 
-                string response = WEB_CLIENT.UploadString(API_URL, "POST", jsonRequest);
+                string jsonRequest = JsonConvert.SerializeObject(request);
+
+                string response = WEB_CLIENT.UploadString(API_URL, jsonRequest);
+
                 return SERIALIZER.Deserialize<CreateContactJsonAnswer>(response);
-                
             }
-            catch {
+            catch
+            {
                 return null;
             }
         }
 
         public List<CreatedDocumentInfo> CreateDocument(CreateDocumentParams _input)
         {
+            _input.TOKEN = TOKEN;
 
-            
 
             return null;
         }
@@ -571,7 +629,7 @@ namespace API_NovaPoshta
             foreach (string pattern in typePatterns)
             {
                 int idx = lowered.IndexOf(pattern);
-                if (idx >= 0 && idx < firstCut 
+                if (idx >= 0 && idx < firstCut
                     && _redSymbols.Contains(lowered.Substring(idx + pattern.Length, 1)))
                 {
                     result.CityType = NormalizeType(pattern);
@@ -666,12 +724,12 @@ namespace API_NovaPoshta
 
         public void SetRegions()
         {
-            List <NP_Descr_Ref> _out = new List<NP_Descr_Ref>();
+            List<NP_Descr_Ref> _out = new List<NP_Descr_Ref>();
 
             data.GroupBy(r => r.Region)
                 .Select(s => s.First())
                 .ToList()
-                .ForEach(x=>_out
+                .ForEach(x => _out
                 .Add(new NP_Descr_Ref(x.Region, x.RegionsDescription)));
 
             Regions = _out;
@@ -732,7 +790,7 @@ namespace API_NovaPoshta
 
             foreach (NP_CityInfo _one in data)
             {
-                if (!_one.Description.ToLower().Contains(_findString) 
+                if (!_one.Description.ToLower().Contains(_findString)
                     && (_one.AreaDescription.ToLower().Contains(_findString)
                     || _one.RegionsDescription.ToLower().Contains(_findString)))
                 {
@@ -847,11 +905,13 @@ namespace API_NovaPoshta
 
     public class CreateDocumentParams
     {
-        private string TOKEN { get; set; }
+        public string TOKEN { get; set; }
 
-        public CreateDocumentParams(string token)
+        public CreateDocumentParams(CreateContactJsonAnswer _recepientInfo, string Phone)
         {
-            TOKEN = token;
+            RecipientsPhone = Phone;
+            Recipient = _recepientInfo.Recipient;
+            ContactRecipient = _recepientInfo.ContactRecipient;
         }
 
         public string PayerType { get; set; } = "Recipient";
@@ -875,7 +935,7 @@ namespace API_NovaPoshta
         private string CityRecipient { get; set; }
         private string RecipientAddress { get; set; }
         private string RecipientsPhone { get; set; }
-        private string Recipient {  get; set; }
+        private string Recipient { get; set; }
         private string ContactRecipient { get; set; }
 
         private const string modelName = "InternetDocument";
@@ -921,11 +981,28 @@ namespace API_NovaPoshta
 
     public class OptionsSeat
     {
+        public OptionsSeat()
+        {
+
+        }
+
+        public OptionsSeat(byte L, byte W, byte H)
+        {
+            Length = L;
+            Width = W;
+            Height = H;
+        }
+
         public byte Length { get; set; }
         public byte Width { get; set; }
         public byte Height { get; set; }
         public float weigth => (Length * Width * Height) / 4000f;
         public override string ToString()
+        {
+            return string.Join(" * ", Length, Width, Height);
+        }
+
+        public string ToJSON()
         {
             return "\t{\n" + string.Join(",\n\t\t",
                 "\t\t\"volumetricLength\": " + Length,
@@ -934,25 +1011,44 @@ namespace API_NovaPoshta
                 ) + "\n\t\t}";
         }
     }
-
+    /// <summary>
+    /// Counterparty=>save (Інформація по створеному отримувачу для ТТН)
+    /// </summary>
     public class CreateContactJsonAnswer
     {
         public bool success { get; set; }
         public List<ClientCounterparty> data { get; set; }
-        public string Recipient => data?.First().Ref;
-        public string ContactRecipient => data?.First().ContactPerson?.data?.First().Ref;
+        public string Recipient => data?.First()?.Ref;
+        public string ContactRecipient => data?.First()?.ContactPerson?.data?.First()?.Ref;
     }
-
+    /// <summary>
+    /// Інформація по створеному отримувачу
+    /// </summary>
     public class ClientCounterparty
     {
         public string Ref { get; set; }
         public ContactPersonJsonAnswer ContactPerson { get; set; }
     }
-
+    /// <summary>
+    /// Інформація по контакту створеного контрагента (отримувача)
+    /// </summary>
     public class ContactPersonJsonAnswer
     {
         public bool success { get; set; }
         public List<ContactPerson> data { get; set; }
+    }
+    /// <summary>
+    /// Відповідь на CounterpartyGeneral=>getCounterparties
+    /// </summary>
+    public class ContactPersonCounterpartyJsonAnswer
+    {
+        public bool success { get; set; }
+        public List<RefInfo> data { get; set; }
+    }
+
+    public class RefInfo
+    {
+        public string Ref { get; set; }
     }
 
     public class ContactPerson
@@ -969,13 +1065,21 @@ namespace API_NovaPoshta
         public bool success { get; set; }
         public List<CreatedDocumentInfo> data { get; set; }
     }
-
+    /// <summary>
+    /// Інформація по створеній ТТН
+    /// </summary>
     public class CreatedDocumentInfo
     {
-        public string Ref { get;set; }
+        public string Ref { get; set; }
         public float CostOnSite { get; set; }
         public DateTime EstimatedDeliveryDate { get; set; }
         public string IntDocNumber { get; set; }
         public string TypeDocument { get; set; }
+    }
+
+    public class RecepientAdress
+    {
+        public string CityRef { get; set; }
+        public string WarehouseRef { get; set; }
     }
 }

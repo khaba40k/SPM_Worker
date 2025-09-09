@@ -143,6 +143,12 @@
     <Compile Include="forms\MAIN_FORM\MoveForm.Designer.cs">
       <DependentUpon>MoveForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="forms\MAIN_FORM\NP_InternetDocument.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="forms\MAIN_FORM\NP_InternetDocument.Designer.cs">
+      <DependentUpon>NP_InternetDocument.cs</DependentUpon>
+    </Compile>
     <Compile Include="forms\MAIN_FORM\Vitraty.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -211,6 +217,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="forms\MAIN_FORM\MoveForm.resx">
       <DependentUpon>MoveForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\MAIN_FORM\NP_InternetDocument.resx">
+      <DependentUpon>NP_InternetDocument.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="forms\MAIN_FORM\Vitraty.resx">
       <DependentUpon>Vitraty.cs</DependentUpon>
@@ -444,16 +453,11 @@
     <Error Condition="!Exists('packages\WinSCP.6.5.3\build\WinSCP.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\WinSCP.6.5.3\build\WinSCP.targets'))" />
   </Target>
   <Target Name="CopyProjectReferencesLocal" AfterTargets="Build">
-  <ItemGroup>
-    <ProjectReferencesOutput Include="@(ProjectReference->'%(FullPath)')"/>
-  </ItemGroup>
-
-  <Message Text="Copying references for: @(ProjectReferencesOutput)" Importance="high" />
-
-  <Copy 
-    SourceFiles="@(ReferenceCopyLocalPaths)" 
-    DestinationFolder="$(OutDir)" 
-    SkipUnchangedFiles="true" />
+    <ItemGroup>
+      <ProjectReferencesOutput Include="@(ProjectReference->'%(FullPath)')" />
+    </ItemGroup>
+    <Message Text="Copying references for: @(ProjectReferencesOutput)" Importance="high" />
+    <Copy SourceFiles="@(ReferenceCopyLocalPaths)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
   <Import Project="packages\WinSCP.6.5.3\build\WinSCP.targets" Condition="Exists('packages\WinSCP.6.5.3\build\WinSCP.targets')" />
   <PropertyGroup>

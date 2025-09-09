@@ -10,44 +10,41 @@ namespace SPM_Worker
         public string VALUE1 { get; private set; }
         public string VALUE2 { get; private set; }
 
-        public MoveForm(string[] input_array, string[] defVal = null)
+        public MoveForm(string[] input_labels, string[] defVal = null)
         {
             InitializeComponent();
 
-            Height = 60 + (60 * input_array.Length);
+            Height = 80 + (80 * input_labels.Length);
 
             using (Font _f = AppFonts.LogoFont(12))
             {
-                if (input_array.Length >= 1)
+                if (input_labels.Length >= 1)
                 {
                     lb0.Font = _f;
-                    lb0.Text = input_array[0];
+                    lb0.Text = input_labels[0];
 
-                    tb0.TextChanged += (s, e) =>
-                    {
-                        VALUE0 = tb0.Text;
-                    };
+                    tb0.TextChanged += (s, e) => VALUE0 = tb0.Text;
                 }
 
-                if (input_array.Length >= 2)
+                if (input_labels.Length >= 2 
+                    && !string.IsNullOrWhiteSpace(defVal[1]))
                 {
-                    tb1.Visible = true;
-                    lb1.Visible = true;
-                    lb1.Font = _f;
-                    lb1.Text = input_array[1];
+                    ttnNeed.Text = input_labels[1];
+                    ttnNeed.Visible = true;
+                    ttnNeed.Font = _f;
 
-                    tb1.TextChanged += (s, e) =>
-                    {
-                        VALUE1 = tb1.Text;
-                    };
+                    rb_yes.CheckedChanged += Rb_CheckedChanged;
+                    rb_no.CheckedChanged += Rb_CheckedChanged;
+
+                    buttonOK.Enabled = false;
                 }
 
-                if (input_array.Length == 3)
+                if (input_labels.Length == 3)
                 {
                     tb2.Visible = true;
                     lb2.Visible = true;
                     lb2.Font = _f;
-                    lb2.Text = input_array[2];
+                    lb2.Text = input_labels[2];
 
                     tb2.TextChanged += (s, e) =>
                     {
@@ -63,10 +60,6 @@ namespace SPM_Worker
             {
                 tb0.Select();
             }
-            else if (string.IsNullOrWhiteSpace(tb1.Text))
-            {
-                tb1.Select();
-            }
             else
             {
                 tb2.Select();
@@ -76,16 +69,35 @@ namespace SPM_Worker
             {
                 tb0.Text = defVal[0];
 
-                if (defVal.Length > 1)
-                {
-                    tb1.Text = defVal[1];
-                }
-
                 if (defVal.Length > 2)
                 {
                     tb2.Text = defVal[2];
                 }
             }
+        }
+
+        private void Rb_CheckedChanged(object sender, System.EventArgs e)
+        {
+            RadioButton rb = sender as RadioButton;
+
+            byte _tag = (byte)rb.Tag;
+
+            if (_tag == 1) 
+            {
+                buttonOK.Enabled = false;
+
+
+
+            }
+            else
+            {
+                buttonOK.Enabled = true;
+            }
+        }
+
+        private void nP_InternetDocument1_Load(object sender, System.EventArgs e)
+        {
+
         }
     }
 }

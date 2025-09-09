@@ -167,13 +167,13 @@ namespace SPM_Worker
 
             //REDAKTOR
 
-            g.DrawString(INFO.REDAKTOR, _font,
-                    _brush, new PointF(leftPos + CellWidth[0] + (CellWidth[1] / 4), -14));
+            //g.DrawString(INFO.REDAKTOR, _font,
+            //        _brush, new PointF(leftPos + CellWidth[0] + (CellWidth[1] / 4), -14));
 
-            _brush.Color = BackColor;
+            //_brush.Color = BackColor;
 
-            g.DrawString(INFO.REDAKTOR, _font,
-                    _brush, new PointF(leftPos + CellWidth[0] + (CellWidth[1] / 4) + 5, -11));
+            //g.DrawString(INFO.REDAKTOR, _font,
+            //        _brush, new PointF(leftPos + CellWidth[0] + (CellWidth[1] / 4) + 5, -11));
 
             //INFO.NUMBER
             if (INFO.NUMBER > 0)
