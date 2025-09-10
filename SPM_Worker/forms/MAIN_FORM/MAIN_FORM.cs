@@ -487,6 +487,24 @@ namespace SPM_Worker
 
             MessageBox.Show(NP.TEST(_params));
         }
+
+        private void remoweNPfiles_Click(object sender, EventArgs e)
+        {
+            if (DialogResult.Yes ==
+                CustomMessage.Show("Видалити локальні файли нової пошти (Повторно загрузяться за потреби)",
+                "Чистка", MessageBoxButtons.YesNo, MessageBoxIcon.Hand))
+            {
+                string dir = Path.Combine(Environment
+                .GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "spm", "NP");
+
+                string[] files = Directory.GetFiles(dir, "*.json");
+
+                foreach (string file in files) { 
+                    File.Delete(file);
+                }
+            }
+        }
     }
 
     public enum BUTTONS_MENU : byte

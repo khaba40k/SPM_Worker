@@ -18,6 +18,7 @@ namespace SPM_Worker
             );
 
         private int WarehouseNumber = 0;
+        private bool pakParametrLock = false;
 
         public NP_InternetDocument()
         {
@@ -31,6 +32,11 @@ namespace SPM_Worker
             tb_CitySearch.Text = addr;
         }
 
+        public void SetAddr(string Addr)
+        {
+            tb_CitySearch.Text = Addr;
+        }
+
         private void NP_InternetDocument_Load(object sender, System.EventArgs e)
         {
             dateTime.Value = DateTime.Now;
@@ -42,16 +48,20 @@ namespace SPM_Worker
 
             cb_payer.SelectedIndex = 0;
 
-            cb_pakList.Items.Add(new OptionsSeat(40, 30, 20));
-            cb_pakList.Items.Add(new OptionsSeat(60, 40, 30));
-            cb_pakList.Items.Add(new OptionsSeat(70, 40, 42));
-
-            cb_pakList.SelectedIndex = 0;
+            cb_pakList.Items.Add(new OptionsSeat("Середня", 40, 30, 20));
+            cb_pakList.Items.Add(new OptionsSeat("Велика до 20кг", 60, 40, 30));
+            cb_pakList.Items.Add(new OptionsSeat("Велика до 30кг", 70, 40, 42));
 
             cb_pakList.SelectedIndexChanged += Cb_pakList_SelectedIndexChanged;
 
+            cb_pakList.SelectedIndex = 0;
+
             rb_ko_yes.CheckedChanged += Rb_ko_CheckedChanged;
             rb_ko_no.CheckedChanged += Rb_ko_CheckedChanged;
+
+            tbPakLeng.TextChanged += tbPakParametrChanged;
+            tbPakWidth.TextChanged += tbPakParametrChanged;
+            tbPakHeig.TextChanged += tbPakParametrChanged;
         }
 
         private void Rb_ko_CheckedChanged(object sender, EventArgs e)
@@ -74,13 +84,40 @@ namespace SPM_Worker
 
         private void Cb_pakList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            OptionsSeat _pak = cb_pakList.SelectedItem as OptionsSeat;
+            ComboBox _cb = sender as ComboBox;
+            OptionsSeat _pak = _cb.SelectedItem as OptionsSeat;
+
+            pakParametrLock = true;
 
             tbPakLeng.Text = _pak.Length.ToString();
             tbPakWidth.Text = _pak.Width.ToString();
             tbPakHeig.Text = _pak.Height.ToString();
 
+            pakParametrLock = false;
+
             tb_weight.Text = _pak.weigth.ToString();
+        }
+
+        private void tbPakParametrChanged(object sender, EventArgs e)
+        {
+            if (pakParametrLock) return;
+
+            try
+            {
+                OptionsSeat _op = new OptionsSeat()
+                {
+                    Length = byte.Parse(tbPakLeng.Text),
+                    Width = byte.Parse(tbPakWidth.Text),
+                    Height = byte.Parse(tbPakHeig.Text)
+                };
+
+                tb_weight.Text = _op.weigth.ToString();
+
+            }
+            catch
+            {
+                tb_weight.Text = "";
+            }
         }
 
         private void tb_CitySearch_TextChanged(object sender, EventArgs e)
@@ -95,7 +132,7 @@ namespace SPM_Worker
                 WarehouseNumber = 0;
             }
 
-            List<NP_CityInfo> _cities = NP.FindByCityName(find.CityName);
+            List<NP_CityInfo> _cities = NP.FindByCityName(find.CityName, NovaPoshta.FindIn.LocalCitiFile);
 
             if (find.Oblast != null)
             {
@@ -104,12 +141,12 @@ namespace SPM_Worker
                     .ToList();
             }
 
-            if (find.Rajon != null)
-            {
-                _cities = _cities.Where(c => c.RegionsDescription.ToLower()
-                    .Contains(find.Rajon.ToLower()))
-                    .ToList();
-            }
+            //if (find.Rajon != null)
+            //{
+            //    _cities = _cities.Where(c => c.RegionsDescription.ToLower()
+            //        .Contains(find.Rajon.ToLower()))
+            //        .ToList();
+            //}
 
             cbCityList.Items.AddRange(_cities.ToArray());
 
@@ -118,6 +155,8 @@ namespace SPM_Worker
                 cbCityList.SelectedIndex = 0;
             }
         }
+
+
 
         private void cbCityList_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -138,6 +177,12 @@ namespace SPM_Worker
                     }
                 }
             }
+        }
+
+        private void NP_InternetDocument_VisibleChanged(object sender, EventArgs e)
+        {
+            rb_ko_yes.Checked = false;
+            rb_ko_no.Checked = false;
         }
     }
 

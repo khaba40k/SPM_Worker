@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
+using File = System.IO.File;
 
 namespace API_NovaPoshta
 {
@@ -349,21 +350,46 @@ namespace API_NovaPoshta
             }
         }
 
-        public List<NP_CityInfo> FindByCityName(string _cityName)
+        public enum FindIn : byte
+        {
+            LocalCitiFile,
+            LocalCitiList,
+            APICities,
+            APISettlements
+        }
+
+        public List<NP_CityInfo> FindByCityName(string _cityName, FindIn findIn = FindIn.LocalCitiList)
         {
             List<NP_CityInfo> _finded = new List<NP_CityInfo>();
 
-            string[] _files = Directory.GetFiles(CASH_PATH, "*.json");
-
             NP_CITIES _searchIn;
 
-            foreach (string _file in _files)
-            {
-                if (Path.GetFileName(_file).Contains("-"))
+            if (findIn == FindIn.LocalCitiFile) {
+                if (File.Exists(Path.Combine(CASH_PATH, FILENAME_CITIES_CASH)))
                 {
-                    if (DeSerializeIfActual(Path.GetFileName(_file), out _searchIn, 0))
+                    if (DeSerializeIfActual(FILENAME_CITIES_CASH, out _searchIn, 0))
                     {
                         _finded.AddRange(_searchIn.FindByString(_cityName));
+                    }
+                }
+                else
+                {
+                    return _finded;
+                }
+            }
+            else
+            {
+                string[] _files = Directory.GetFiles(CASH_PATH, "*.json");
+
+
+                foreach (string _file in _files)
+                {
+                    if (Path.GetFileName(_file).Contains("-"))
+                    {
+                        if (DeSerializeIfActual(Path.GetFileName(_file), out _searchIn, 0))
+                        {
+                            _finded.AddRange(_searchIn.FindByString(_cityName));
+                        }
                     }
                 }
             }
@@ -807,6 +833,7 @@ namespace API_NovaPoshta
         public string AreaDescription { get; set; }
         public string Ref { get; set; }
         public string SettlementType { get; set; }
+        public string SettlementTypeDescription { get; set; }
         public string Description { get; set; }
         public override string ToString()
         {
@@ -825,11 +852,8 @@ namespace API_NovaPoshta
                 Description = baseCity.Description,
             };
         }
-
-        public string SettlementTypeDescription { get; set; }
         public string Region { get; set; }
         public string RegionsDescription { get; set; }
-
         public override string ToString()
         {
             return (ConvertCityType() + " " + RemoweScob(base.ToString())).Trim();
@@ -981,13 +1005,15 @@ namespace API_NovaPoshta
 
     public class OptionsSeat
     {
+        private string LABEL = "";
         public OptionsSeat()
         {
 
         }
 
-        public OptionsSeat(byte L, byte W, byte H)
+        public OptionsSeat(string label, byte L, byte W, byte H)
         {
+            LABEL = label ?? "";
             Length = L;
             Width = W;
             Height = H;
@@ -999,7 +1025,7 @@ namespace API_NovaPoshta
         public float weigth => (Length * Width * Height) / 4000f;
         public override string ToString()
         {
-            return string.Join(" * ", Length, Width, Height);
+            return (LABEL + "  " + string.Join(" * ", Length, Width, Height)).TrimStart();
         }
 
         public string ToJSON()

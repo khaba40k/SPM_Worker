@@ -156,7 +156,7 @@ namespace SPM_Worker
             }
             else
             {
-                using (MoveForm _form = new MoveForm(new string[] {
+                using (MoveForm _form1 = new MoveForm(new string[] {
                             "Працівник",
                             "Створити накладну",
                             "Сума (факт)"
@@ -164,20 +164,20 @@ namespace SPM_Worker
                             _inf.WORKER,
                             _inf.TTN_OUT,
                             _inf.SUM.ToString()
-                        }))
+                        }, _inf.REQV ?? ""))
                 {
-                    if (_form.ShowDialog() == DialogResult.OK)
+                    if (_form1.ShowDialog() == DialogResult.OK)
                     {
                         _inf.WORKER = 
-                            !string.IsNullOrWhiteSpace(_form.VALUE0)
-                            ? _form.VALUE0.Trim()
+                            !string.IsNullOrWhiteSpace(_form1.VALUE0)
+                            ? _form1.VALUE0.Trim()
                             : null;
 
-                        _inf.TTN_OUT = !string.IsNullOrWhiteSpace(_form.VALUE1)
-                        ? _form.VALUE1.Trim()
+                        _inf.TTN_OUT = !string.IsNullOrWhiteSpace(_form1.VALUE1)
+                        ? _form1.VALUE1.Trim()
                         : null;
 
-                        _inf.SUM = TEXT_TO._FLOAT(_form.VALUE2);
+                        _inf.SUM = TEXT_TO._FLOAT(_form1.VALUE2);
 
                         _inf.DATE_OUT = DateTime.Now;
 

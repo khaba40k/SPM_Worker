@@ -36,6 +36,7 @@ namespace SPM_Worker
             this.tESTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panelContent = new System.Windows.Forms.Panel();
             this.panelMenu = new System.Windows.Forms.FlowLayoutPanel();
+            this.remoweNPfiles = new System.Windows.Forms.ToolStripMenuItem();
             this.MENU_CONTEXT.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,7 +54,8 @@ namespace SPM_Worker
             // mcFile
             // 
             this.mcFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveCSVhistory});
+            this.saveCSVhistory,
+            this.remoweNPfiles});
             this.mcFile.Name = "mcFile";
             this.mcFile.Size = new System.Drawing.Size(59, 26);
             this.mcFile.Text = "Файл";
@@ -62,7 +64,7 @@ namespace SPM_Worker
             // 
             this.saveCSVhistory.Image = global::SPM_Worker.Properties.Resources.printdone_z;
             this.saveCSVhistory.Name = "saveCSVhistory";
-            this.saveCSVhistory.Size = new System.Drawing.Size(190, 26);
+            this.saveCSVhistory.Size = new System.Drawing.Size(285, 26);
             this.saveCSVhistory.Text = "Історія товару";
             this.saveCSVhistory.Visible = false;
             // 
@@ -98,6 +100,15 @@ namespace SPM_Worker
             this.panelMenu.TabIndex = 4;
             this.panelMenu.WrapContents = false;
             // 
+            // remoweNPfiles
+            // 
+            this.remoweNPfiles.ForeColor = System.Drawing.Color.Red;
+            this.remoweNPfiles.Image = global::SPM_Worker.Properties.Resources.img_del;
+            this.remoweNPfiles.Name = "remoweNPfiles";
+            this.remoweNPfiles.Size = new System.Drawing.Size(285, 26);
+            this.remoweNPfiles.Text = "Видалити кеш Нової Пошти";
+            this.remoweNPfiles.Click += new System.EventHandler(this.remoweNPfiles_Click);
+            // 
             // MAIN_FORM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -127,5 +138,6 @@ namespace SPM_Worker
         private System.Windows.Forms.FlowLayoutPanel panelMenu;
         private System.Windows.Forms.ToolStripMenuItem saveCSVhistory;
         private System.Windows.Forms.ToolStripMenuItem tESTToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem remoweNPfiles;
     }
 }

@@ -38,8 +38,10 @@ namespace SPM_Worker
             this.ttnNeed = new System.Windows.Forms.GroupBox();
             this.rb_no = new System.Windows.Forms.RadioButton();
             this.rb_yes = new System.Windows.Forms.RadioButton();
-            this.nP_InternetDocument1 = new SPM_Worker.NP_InternetDocument();
+            this.NP_PANEL = new System.Windows.Forms.Panel();
+            this.NP_FORM = new SPM_Worker.NP_InternetDocument();
             this.ttnNeed.SuspendLayout();
+            this.NP_PANEL.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -49,7 +51,7 @@ namespace SPM_Worker
             this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.buttonOK.Enabled = false;
             this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.buttonOK.Location = new System.Drawing.Point(211, 450);
+            this.buttonOK.Location = new System.Drawing.Point(151, 422);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 32);
             this.buttonOK.TabIndex = 3;
@@ -63,7 +65,7 @@ namespace SPM_Worker
             this.buttonCancel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.buttonCancel.Location = new System.Drawing.Point(12, 450);
+            this.buttonCancel.Location = new System.Drawing.Point(12, 422);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 32);
             this.buttonCancel.TabIndex = 4;
@@ -75,7 +77,7 @@ namespace SPM_Worker
             this.tb0.Location = new System.Drawing.Point(12, 40);
             this.tb0.MaxLength = 20;
             this.tb0.Name = "tb0";
-            this.tb0.Size = new System.Drawing.Size(277, 24);
+            this.tb0.Size = new System.Drawing.Size(214, 24);
             this.tb0.TabIndex = 0;
             this.tb0.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.tb0.WordWrap = false;
@@ -97,7 +99,7 @@ namespace SPM_Worker
             this.tb2.Location = new System.Drawing.Point(12, 179);
             this.tb2.MaxLength = 20;
             this.tb2.Name = "tb2";
-            this.tb2.Size = new System.Drawing.Size(274, 24);
+            this.tb2.Size = new System.Drawing.Size(214, 24);
             this.tb2.TabIndex = 2;
             this.tb2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.tb2.Visible = false;
@@ -111,9 +113,9 @@ namespace SPM_Worker
             this.lb2.ForeColor = System.Drawing.Color.White;
             this.lb2.Location = new System.Drawing.Point(12, 156);
             this.lb2.Name = "lb2";
-            this.lb2.Size = new System.Drawing.Size(91, 22);
+            this.lb2.Size = new System.Drawing.Size(125, 22);
             this.lb2.TabIndex = 3;
-            this.lb2.Text = "ТТН (вх)";
+            this.lb2.Text = "Сума (Факт)";
             this.lb2.Visible = false;
             // 
             // ttnNeed
@@ -125,10 +127,11 @@ namespace SPM_Worker
             this.ttnNeed.ForeColor = System.Drawing.Color.White;
             this.ttnNeed.Location = new System.Drawing.Point(13, 65);
             this.ttnNeed.Name = "ttnNeed";
-            this.ttnNeed.Size = new System.Drawing.Size(276, 88);
+            this.ttnNeed.Size = new System.Drawing.Size(213, 88);
             this.ttnNeed.TabIndex = 5;
             this.ttnNeed.TabStop = false;
             this.ttnNeed.Text = "Накладна";
+            this.ttnNeed.Visible = false;
             // 
             // rb_no
             // 
@@ -138,9 +141,9 @@ namespace SPM_Worker
             this.rb_no.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rb_no.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.rb_no.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.rb_no.Location = new System.Drawing.Point(149, 27);
+            this.rb_no.Location = new System.Drawing.Point(110, 27);
             this.rb_no.Name = "rb_no";
-            this.rb_no.Size = new System.Drawing.Size(103, 42);
+            this.rb_no.Size = new System.Drawing.Size(86, 42);
             this.rb_no.TabIndex = 0;
             this.rb_no.Tag = "0";
             this.rb_no.Text = "НІ";
@@ -155,33 +158,49 @@ namespace SPM_Worker
             this.rb_yes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rb_yes.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.rb_yes.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.rb_yes.Location = new System.Drawing.Point(23, 27);
+            this.rb_yes.Location = new System.Drawing.Point(15, 27);
             this.rb_yes.Name = "rb_yes";
-            this.rb_yes.Size = new System.Drawing.Size(103, 42);
+            this.rb_yes.Size = new System.Drawing.Size(89, 42);
             this.rb_yes.TabIndex = 0;
             this.rb_yes.Tag = "1";
             this.rb_yes.Text = "ТАК";
             this.rb_yes.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rb_yes.UseVisualStyleBackColor = false;
             // 
-            // nP_InternetDocument1
+            // NP_PANEL
             // 
-            this.nP_InternetDocument1.BackColor = System.Drawing.Color.Red;
-            this.nP_InternetDocument1.Location = new System.Drawing.Point(295, 3);
-            this.nP_InternetDocument1.Name = "nP_InternetDocument1";
-            this.nP_InternetDocument1.Size = new System.Drawing.Size(276, 484);
-            this.nP_InternetDocument1.TabIndex = 6;
-            this.nP_InternetDocument1.Load += new System.EventHandler(this.nP_InternetDocument1_Load);
+            this.NP_PANEL.AutoSize = true;
+            this.NP_PANEL.BackColor = System.Drawing.Color.Red;
+            this.NP_PANEL.Controls.Add(this.NP_FORM);
+            this.NP_PANEL.Dock = System.Windows.Forms.DockStyle.Right;
+            this.NP_PANEL.Location = new System.Drawing.Point(246, 0);
+            this.NP_PANEL.Name = "NP_PANEL";
+            this.NP_PANEL.Size = new System.Drawing.Size(278, 466);
+            this.NP_PANEL.TabIndex = 6;
+            // 
+            // NP_FORM
+            // 
+            this.NP_FORM.AutoSize = true;
+            this.NP_FORM.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.NP_FORM.BackColor = System.Drawing.Color.Red;
+            this.NP_FORM.Cost = 0F;
+            this.NP_FORM.Dock = System.Windows.Forms.DockStyle.Left;
+            this.NP_FORM.Location = new System.Drawing.Point(0, 0);
+            this.NP_FORM.Name = "NP_FORM";
+            this.NP_FORM.Size = new System.Drawing.Size(278, 466);
+            this.NP_FORM.TabIndex = 0;
+            this.NP_FORM.KontrolOplatySelected += new System.EventHandler(this.NP_FORM_KontrolOplatySelected);
             // 
             // MoveForm
             // 
             this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.ClientSize = new System.Drawing.Size(577, 494);
-            this.Controls.Add(this.nP_InternetDocument1);
+            this.ClientSize = new System.Drawing.Size(524, 466);
+            this.Controls.Add(this.NP_PANEL);
             this.Controls.Add(this.ttnNeed);
             this.Controls.Add(this.lb2);
             this.Controls.Add(this.lb0);
@@ -194,6 +213,7 @@ namespace SPM_Worker
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(240, 150);
             this.Name = "MoveForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
@@ -201,6 +221,8 @@ namespace SPM_Worker
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "MoveForm";
             this.ttnNeed.ResumeLayout(false);
+            this.NP_PANEL.ResumeLayout(false);
+            this.NP_PANEL.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -217,6 +239,7 @@ namespace SPM_Worker
         private System.Windows.Forms.GroupBox ttnNeed;
         private System.Windows.Forms.RadioButton rb_no;
         private System.Windows.Forms.RadioButton rb_yes;
-        private NP_InternetDocument nP_InternetDocument1;
+        private System.Windows.Forms.Panel NP_PANEL;
+        private NP_InternetDocument NP_FORM;
     }
 }
