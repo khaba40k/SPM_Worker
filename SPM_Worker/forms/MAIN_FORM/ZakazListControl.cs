@@ -225,6 +225,7 @@ namespace SPM_Worker
                         }
                         else
                         {
+                            SOME_CHANGED = true;
                             _inf.TTN_OUT = string.Empty;
                         }
                     }

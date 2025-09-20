@@ -1,5 +1,4 @@
 ﻿using API_NovaPoshta;
-using OfficeOpenXml.FormulaParsing.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,6 +21,8 @@ namespace SPM_Worker
                 if (tb_ko.Enabled) tb_ko.Text = _cost.ToString();
             }
         }
+
+        public string ZakazNumber { set { tb_comm.Text += $" №{value}"; } }
 
         private float _cost = 0f;
 
@@ -60,7 +61,7 @@ namespace SPM_Worker
             dateTime.Value = DateTime.Now;
 
             cb_payer.Items.AddRange(new PayerInfo[] { 
-                new PayerInfo { Name = "Отримувач", Value = "Recipient" },
+                new PayerInfo { Name = "Одержувач", Value = "Recipient" },
                 new PayerInfo { Name = "Відправник", Value = "Sender" }
             });
 

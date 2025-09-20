@@ -18,6 +18,11 @@ namespace SPM_Worker
         {
             InitializeComponent();
 
+            if (_inputZakaz.NUMBER != null && _inputZakaz.NUMBER > 0)
+            {
+                NP_FORM.ZakazNumber = _inputZakaz.NUMBER.ToString();
+            }
+
             NP_PANEL.Visible = false;
 
             Width = MinimumSize.Width;

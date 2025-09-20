@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace SPM_Worker
@@ -20,7 +21,11 @@ namespace SPM_Worker
             AutorizeInfo _ans;
             AutorizeForm _login = new AutorizeForm();
 
-            if (UpdateINFO.CheckUpdate(out string[] files, "update.exe"))
+            if (UpdateINFO.CheckUpdate(out string[] files, "update.exe") 
+                && DialogResult.Yes == MessageBox.Show(string.Join("\n", files), 
+                "Оновлення",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question))
             {
                 //ОБНОВА
 
@@ -41,14 +46,13 @@ namespace SPM_Worker
                 try
                 {
                     Process.Start(psi);
-                    
-                    Application.Exit();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Не вдалося запустити {updateExe}: {ex.Message}");
-                    Application.Exit();
                 }
+
+                Application.Exit();
             }
             else
             {

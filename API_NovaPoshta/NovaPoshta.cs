@@ -954,11 +954,14 @@ namespace API_NovaPoshta
         {
             string _out = "";
 
-            string[] _spl = SettlementTypeDescription.Split(' ');
+            string[] _spl = SettlementTypeDescription?.Split(' ');
 
-            foreach (string s in _spl)
+            if (_spl != null)
             {
-                _out += s.Substring(0, 1) + ".";
+                foreach (string s in _spl)
+                {
+                    _out += s.Substring(0, 1) + ".";
+                }
             }
 
             return _out.Trim();

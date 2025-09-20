@@ -456,7 +456,6 @@ namespace SPM_Worker
             }
         }
 
-
         private void ShowTTNList(object sender, EventArgs e)
         {
             ClickedMenu(sender as Button);
@@ -470,13 +469,14 @@ namespace SPM_Worker
             {
                 List<DocumentInfo> _docs = NP.GetDocumentList(DateTime.Now);
 
-                int ImageWidth = 512;
+                int ImageWidth = 720;
                 int paddings = 10;
+                int lineInterval = 5;
                 int oneDocHeight = 150;
 
                 if (_docs != null && _docs.Count > 0)
                 {
-                    Bitmap bmp = new Bitmap(ImageWidth, _docs.Count * oneDocHeight + (paddings * 2) + (paddings * (_docs.Count - 1)));
+                    Bitmap bmp = new Bitmap(ImageWidth, _docs.Count * oneDocHeight + (paddings * (_docs.Count + 3)));
 
                     int posY = paddings;
 
@@ -491,10 +491,12 @@ namespace SPM_Worker
 
                         foreach (DocumentInfo doc in _docs)
                         {
-                            localLineY = posY + paddings;
+                            localLineY = posY + lineInterval;
 
                             g.DrawRectangle(new Pen(_brush), paddings, localLineY,
                                 ImageWidth - (paddings * 2), oneDocHeight);
+
+                            localLineY += paddings;
 
                             g.DrawString(doc.DateTime.ToString(), _f, _brush,
                                 paddings * 2, localLineY);
@@ -504,26 +506,52 @@ namespace SPM_Worker
                             g.DrawString(doc.IntDocNumber, _f, _brush,
                                 bmp.Width - (paddings * 2) - StringSize.Width, localLineY);
 
-                            localLineY += StringSize.Height + paddings;
+                            localLineY += StringSize.Height + lineInterval;
 
-                            g.DrawString(doc.RecipientContactPerson, _f, _brush,
+                            g.DrawString(
+                                string.Join(", ", doc.RecipientsPhone,
+                                doc.RecipientContactPerson,
+                                doc.Cost + " грн.",
+                                doc.Weight + " кг."),
+                                _f, _brush,
+                                paddings * 2, localLineY);
+
+                            localLineY += StringSize.Height + lineInterval;
+
+                            g.DrawString(doc.CityRecipientDescription, _f, _brush,
                                   paddings * 2, localLineY);
+
+                            localLineY += StringSize.Height + lineInterval;
+
+                            g.DrawString(doc.Description, _f, _brush,
+                                  paddings * 2, localLineY);
+
+                            localLineY += StringSize.Height + lineInterval;
+
+                            StringSize = g.MeasureString(doc.StateName.ToUpper(), _f);
+
+                            g.DrawString(doc.StateName.ToUpper(), _f, _brush,
+                                  bmp.Width - paddings - StringSize.Width, localLineY);
 
                             posY += oneDocHeight + paddings;
                         }
                     }
 
+                    Panel _cont = new Panel{
+                        AutoScroll = true
+                    };
+
                     PictureBox pb = new PictureBox
                     {
                         Image = bmp,
-                        SizeMode = PictureBoxSizeMode.Zoom,
-                        Dock = DockStyle.Fill
+                        Height = bmp.Height,
+                        Dock = DockStyle.Top,
+                        SizeMode = PictureBoxSizeMode.Zoom
                     };
 
-                    Panel _cont = new Panel{
-                        AutoScroll = true,
-                        Dock = DockStyle.Fill,
-                        BackColor = Color.Red
+                    _cont.ClientSizeChanged += (s, size) =>
+                    {
+                        pb.Width = _cont.ClientSize.Width;
                     };
 
                     _cont.Controls.Add(pb);
