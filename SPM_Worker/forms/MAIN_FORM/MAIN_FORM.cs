@@ -53,19 +53,22 @@ namespace SPM_Worker
             };
 
             //СТВОРЕННЯ КНОПОК МЕНЮ
-            Button _ZakazListBut = new Button() { Text = "Замовлення", Tag = BUTTONS_MENU.ZAKAZ_LIST };
-            Button _VitratyBut = new Button() { Text = "Витрати", Tag = BUTTONS_MENU.VYTRATY };
-            Button _SkladBut = new Button() { Text = "Склад", Tag = BUTTONS_MENU.SKLAD };
+            Button _ZakazListBut = new Button { Text = "Замовлення", Tag = BUTTONS_MENU.ZAKAZ_LIST };
+            Button _TTNList = new Button { Text = "Накладні", Tag = BUTTONS_MENU.TTN_LIST };
+            Button _VitratyBut = new Button { Text = "Витрати", Tag = BUTTONS_MENU.VYTRATY };
+            Button _SkladBut = new Button { Text = "Склад", Tag = BUTTONS_MENU.SKLAD };
 
             //ПРИСВОЄННЯ ДІЇ
 
             _ZakazListBut.Click += SetZakazList;
+            _TTNList.Click += ShowTTNList;
             _VitratyBut.Click += SetVitraty;
             _SkladBut.Click += SetSklad;
 
             //ПРОРИСОВКА КНОПОК
 
             panelMenu.Controls.Add(_ZakazListBut);
+            panelMenu.Controls.Add(_TTNList);
             panelMenu.Controls.Add(_VitratyBut);
             panelMenu.Controls.Add(_SkladBut);
 
@@ -76,7 +79,7 @@ namespace SPM_Worker
                 panelMenu.Controls.Add(_LogsBut);
             }
 
-            ButtonTagClick += (s, e) =>
+            ButtonTagClick += (s, tag) =>
             {
 
             };
@@ -284,7 +287,12 @@ namespace SPM_Worker
 
             panelContent.Controls.Add(_container);
         }
-
+        /// <summary>
+        /// Склад (по товару окремо рух)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static bool SaveExcel(string filePath, List<EXCEL_HISTORY_LINE> data)
         {
             if (data == null || data.Count == 0) return false;
@@ -449,6 +457,82 @@ namespace SPM_Worker
         }
 
 
+        private void ShowTTNList(object sender, EventArgs e)
+        {
+            ClickedMenu(sender as Button);
+
+            panelContent.Controls.Clear();
+
+            using (NovaPoshta NP = new NovaPoshta("4c0e5cf1a2509ca7880c979a68b986a8",
+                Path.Combine(Environment
+                .GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "spm", "NP")))
+            {
+                List<DocumentInfo> _docs = NP.GetDocumentList(DateTime.Now);
+
+                int ImageWidth = 512;
+                int paddings = 10;
+                int oneDocHeight = 150;
+
+                if (_docs != null && _docs.Count > 0)
+                {
+                    Bitmap bmp = new Bitmap(ImageWidth, _docs.Count * oneDocHeight + (paddings * 2) + (paddings * (_docs.Count - 1)));
+
+                    int posY = paddings;
+
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    using (SolidBrush _brush = new SolidBrush(Color.White))
+                    using (Font _f = AppFonts.TextFont(16))
+                    {
+                        g.Clear(Color.Red);
+
+                        SizeF StringSize;
+                        float localLineY;
+
+                        foreach (DocumentInfo doc in _docs)
+                        {
+                            localLineY = posY + paddings;
+
+                            g.DrawRectangle(new Pen(_brush), paddings, localLineY,
+                                ImageWidth - (paddings * 2), oneDocHeight);
+
+                            g.DrawString(doc.DateTime.ToString(), _f, _brush,
+                                paddings * 2, localLineY);
+                            
+                            StringSize = g.MeasureString(doc.IntDocNumber, _f);
+
+                            g.DrawString(doc.IntDocNumber, _f, _brush,
+                                bmp.Width - (paddings * 2) - StringSize.Width, localLineY);
+
+                            localLineY += StringSize.Height + paddings;
+
+                            g.DrawString(doc.RecipientContactPerson, _f, _brush,
+                                  paddings * 2, localLineY);
+
+                            posY += oneDocHeight + paddings;
+                        }
+                    }
+
+                    PictureBox pb = new PictureBox
+                    {
+                        Image = bmp,
+                        SizeMode = PictureBoxSizeMode.Zoom,
+                        Dock = DockStyle.Fill
+                    };
+
+                    Panel _cont = new Panel{
+                        AutoScroll = true,
+                        Dock = DockStyle.Fill,
+                        BackColor = Color.Red
+                    };
+
+                    _cont.Controls.Add(pb);
+
+                    panelContent.Controls.Add(_cont);
+                }
+            }
+        }
+
         private void ShowLogs(object sender, EventArgs e)
         {
             ClickedMenu(sender as Button);
@@ -477,15 +561,19 @@ namespace SPM_Worker
                 "spm", "NP")
             );
 
-            string numberPhone = "0 98 599 26 89 Андрій";
+            List<DocumentInfo> docs = NP.GetDocumentList(DateTime.Now);
+            
+            if (docs != null)
+            {
+                string mes = "";
 
-            CreateContactJsonAnswer _recepient = NP.CreateRecepient(ref numberPhone, "Тимошенко", "Андрій");
+                foreach (DocumentInfo documentInfo in docs)
+                {
+                    mes += documentInfo.IntDocNumber + "\n";
+                }
 
-            CreateDocumentParams _params = new CreateDocumentParams(_recepient, numberPhone);
-
-            _params.OptionsSeat.Add(new OptionsSeat { Height=10, Length=10, Width=10 });
-
-            MessageBox.Show(NP.TEST(_params));
+                MessageBox.Show(mes.TrimEnd());
+            }
         }
 
         private void remoweNPfiles_Click(object sender, EventArgs e)
@@ -512,6 +600,7 @@ namespace SPM_Worker
         ZAKAZ_LIST,
         VYTRATY,
         SKLAD,
-        LOG_LIST
+        LOG_LIST,
+        TTN_LIST
     }
 }

@@ -889,7 +889,7 @@ namespace SPM_Core
             }
         }
 
-        public static bool SAVE_ZAKAZ(ZAKAZ Z, out string mes)
+        public static bool SAVE_ZAKAZ(ref ZAKAZ Z, out string mes)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
@@ -923,13 +923,23 @@ namespace SPM_Core
                     responseText = reader.ReadToEnd();
                 }
 
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                var jsonAns = new
+                {
+                    success = false,
+                    number = 0,
+                    message = ""
+                };
 
-                SERVER_STANDART_ANS _answer = serializer.Deserialize<SERVER_STANDART_ANS>(responseText);
+                jsonAns = JsonConvert.DeserializeAnonymousType(responseText, jsonAns);
 
-                mes = _answer.message;
+                mes = jsonAns.message;
 
-                return _answer.success;
+                if (jsonAns.number != 0)
+                {
+                    Z.NUMBER = jsonAns.number;
+                }
+
+                return jsonAns.success;
             }
             catch (Exception ex)
             {
@@ -984,13 +994,17 @@ namespace SPM_Core
                 responseText = reader.ReadToEnd();
             }
 
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            var jsonAns = new
+            {
+                success = false,
+                message = ""
+            };
 
-            SERVER_STANDART_ANS _answer = serializer.Deserialize<SERVER_STANDART_ANS>(responseText);
+            jsonAns = JsonConvert.DeserializeAnonymousType(responseText, jsonAns);
 
-            mes = _answer.message;
+            mes = jsonAns.message;
 
-            return _answer.success;
+            return jsonAns.success;
         }
 
         public static List<SERVICE_ID_INFO> GET_SKLAD(DateTime _date)
@@ -1072,9 +1086,13 @@ namespace SPM_Core
                     responseText = reader.ReadToEnd();
                 }
 
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                var _answer = new
+                {
+                    success = false,
+                    message = ""
+                };
 
-                SERVER_STANDART_ANS _answer = serializer.Deserialize<SERVER_STANDART_ANS>(responseText);
+                _answer = JsonConvert.DeserializeAnonymousType(responseText, _answer);
 
                 mes = _answer.message;
 
@@ -1133,9 +1151,13 @@ namespace SPM_Core
                 responseText = reader.ReadToEnd();
             }
 
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            var _answer = new
+            {
+                success = false,
+                message = ""
+            };
 
-            SERVER_STANDART_ANS _answer = serializer.Deserialize<SERVER_STANDART_ANS>(responseText);
+            _answer = JsonConvert.DeserializeAnonymousType(responseText, _answer);
 
             mes = _answer.message;
 
@@ -1411,16 +1433,6 @@ namespace SPM_Core
         public override string ToString()
         {
             return NAME;
-        }
-    }
-
-    class SERVER_STANDART_ANS
-    {
-        public bool success { get; set; } = false;
-        public string message { get; set; } = "";
-        public override string ToString()
-        {
-            return message;
         }
     }
 

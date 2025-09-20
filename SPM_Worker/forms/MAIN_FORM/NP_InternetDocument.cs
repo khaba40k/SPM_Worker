@@ -1,6 +1,8 @@
 ﻿using API_NovaPoshta;
+using OfficeOpenXml.FormulaParsing.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -9,8 +11,21 @@ namespace SPM_Worker
 {
     public partial class NP_InternetDocument : UserControl
     {
-        public float Cost { get; set; } = 0f;
-        public event EventHandler KontrolOplatySelected;
+        public float Cost
+        {
+            get => _cost; set
+            {
+                _cost = value;
+
+                tb_cost.Text = _cost.ToString();
+
+                if (tb_ko.Enabled) tb_ko.Text = _cost.ToString();
+            }
+        }
+
+        private float _cost = 0f;
+
+        public event EventHandler<bool> ValueChanged;
         private NovaPoshta NP = new NovaPoshta("4c0e5cf1a2509ca7880c979a68b986a8",
                 Path.Combine(Environment
                 .GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -30,27 +45,30 @@ namespace SPM_Worker
             InitializeComponent();
             Cost = cost;
             tb_CitySearch.Text = addr;
+            SetAddres();
         }
 
         public void SetAddr(string Addr)
         {
             tb_CitySearch.Text = Addr;
+
+            SetAddres();
         }
 
-        private void NP_InternetDocument_Load(object sender, System.EventArgs e)
+        private void NP_InternetDocument_Load(object sender, EventArgs e)
         {
             dateTime.Value = DateTime.Now;
 
             cb_payer.Items.AddRange(new PayerInfo[] { 
-                new PayerInfo{ Name = "Відправник", Value = "Sender" },
-                new PayerInfo{ Name = "Отримувач", Value = "Recepient" }
+                new PayerInfo { Name = "Отримувач", Value = "Recipient" },
+                new PayerInfo { Name = "Відправник", Value = "Sender" }
             });
 
             cb_payer.SelectedIndex = 0;
 
             cb_pakList.Items.Add(new OptionsSeat("Середня", 40, 30, 20));
-            cb_pakList.Items.Add(new OptionsSeat("Велика до 20кг", 60, 40, 30));
-            cb_pakList.Items.Add(new OptionsSeat("Велика до 30кг", 70, 40, 42));
+            cb_pakList.Items.Add(new OptionsSeat("Велика <20кг", 60, 40, 30));
+            cb_pakList.Items.Add(new OptionsSeat("Велика <30кг", 70, 40, 42));
 
             cb_pakList.SelectedIndexChanged += Cb_pakList_SelectedIndexChanged;
 
@@ -62,6 +80,19 @@ namespace SPM_Worker
             tbPakLeng.TextChanged += tbPakParametrChanged;
             tbPakWidth.TextChanged += tbPakParametrChanged;
             tbPakHeig.TextChanged += tbPakParametrChanged;
+
+            tbPakLeng.KeyPress += floatTextBox_KeyPress;
+            tbPakWidth.KeyPress += floatTextBox_KeyPress;
+            tbPakHeig.KeyPress += floatTextBox_KeyPress;
+
+            tb_cost.KeyPress += floatTextBox_KeyPress;
+            tb_ko.KeyPress += floatTextBox_KeyPress;
+            tb_weight.KeyPress += floatTextBox_KeyPress;
+
+            tb_comm.TextChanged += (s, ea) =>
+            {
+                ValueChanged?.Invoke(this, Verification());
+            };
         }
 
         private void Rb_ko_CheckedChanged(object sender, EventArgs e)
@@ -76,10 +107,42 @@ namespace SPM_Worker
             else
             {
                 tb_ko.Enabled = false;
-                tb_ko.Text = "";
+                tb_ko.Text = "0";
             }
 
-            KontrolOplatySelected?.Invoke(this, EventArgs.Empty);
+            ValueChanged?.Invoke(this, Verification());
+        }
+
+        private void floatTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            string _txt = (sender as TextBox)?.Text ?? "";
+
+            if (string.IsNullOrWhiteSpace(_txt))
+            {
+                e.KeyChar = '0';
+                return;
+            }
+
+            if (e.KeyChar == '.' || e.KeyChar == ',')
+            {
+                e.KeyChar = separator[0];
+
+                if (_txt.Contains(separator)) e.Handled = true;
+            }
+            else if (!char.IsControl(e.KeyChar) 
+                && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }else if (!char.IsControl(e.KeyChar) 
+                && _txt.IndexOf(separator) > -1
+                && _txt.IndexOf(separator) == _txt.Length - 3)
+            {
+                e.Handled = true;
+            }
+
+            ValueChanged?.Invoke(this, Verification());
         }
 
         private void Cb_pakList_SelectedIndexChanged(object sender, EventArgs e)
@@ -89,13 +152,15 @@ namespace SPM_Worker
 
             pakParametrLock = true;
 
-            tbPakLeng.Text = _pak.Length.ToString();
-            tbPakWidth.Text = _pak.Width.ToString();
-            tbPakHeig.Text = _pak.Height.ToString();
+            tbPakLeng.Text = _pak.volumetricLength.ToString();
+            tbPakWidth.Text = _pak.volumetricWidth.ToString();
+            tbPakHeig.Text = _pak.volumetricHeight.ToString();
 
             pakParametrLock = false;
 
-            tb_weight.Text = _pak.weigth.ToString();
+            tb_weight.Text = _pak.Weight.ToString();
+
+            ValueChanged?.Invoke(this, Verification());
         }
 
         private void tbPakParametrChanged(object sender, EventArgs e)
@@ -106,57 +171,21 @@ namespace SPM_Worker
             {
                 OptionsSeat _op = new OptionsSeat()
                 {
-                    Length = byte.Parse(tbPakLeng.Text),
-                    Width = byte.Parse(tbPakWidth.Text),
-                    Height = byte.Parse(tbPakHeig.Text)
+                    volumetricLength = byte.Parse(tbPakLeng.Text),
+                    volumetricWidth = byte.Parse(tbPakWidth.Text),
+                    volumetricHeight = byte.Parse(tbPakHeig.Text)
                 };
 
-                tb_weight.Text = _op.weigth.ToString();
+                tb_weight.Text = _op.Weight.ToString();
 
             }
             catch
             {
-                tb_weight.Text = "";
+                tb_weight.Text = "0";
             }
+
+            ValueChanged?.Invoke(this, Verification());
         }
-
-        private void tb_CitySearch_TextChanged(object sender, EventArgs e)
-        {
-            cbCityList.Items.Clear();
-            cb_Warehouses.Items.Clear();
-
-            AddressParts find = AddressParts.Parse(tb_CitySearch.Text);
-
-            if (find.Number == null || !int.TryParse(find.Number, out WarehouseNumber))
-            {
-                WarehouseNumber = 0;
-            }
-
-            List<NP_CityInfo> _cities = NP.FindByCityName(find.CityName, NovaPoshta.FindIn.LocalCitiFile);
-
-            if (find.Oblast != null)
-            {
-                _cities = _cities.Where(c => c.AreaDescription.ToLower()
-                    .Contains(find.Oblast.ToLower()))
-                    .ToList();
-            }
-
-            //if (find.Rajon != null)
-            //{
-            //    _cities = _cities.Where(c => c.RegionsDescription.ToLower()
-            //        .Contains(find.Rajon.ToLower()))
-            //        .ToList();
-            //}
-
-            cbCityList.Items.AddRange(_cities.ToArray());
-
-            if (cbCityList.Items.Count > 0)
-            {
-                cbCityList.SelectedIndex = 0;
-            }
-        }
-
-
 
         private void cbCityList_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -170,13 +199,15 @@ namespace SPM_Worker
             {
                 foreach (WrhInfo _wrh in cb_Warehouses.Items)
                 {
-                    if (_wrh.NUMBER == WarehouseNumber)
+                    if (_wrh.NUMBER == WarehouseNumber.ToString())
                     {
                         cb_Warehouses.SelectedItem = _wrh;
                         break;
                     }
                 }
             }
+
+            ValueChanged?.Invoke(this, Verification());
         }
 
         private void NP_InternetDocument_VisibleChanged(object sender, EventArgs e)
@@ -184,15 +215,117 @@ namespace SPM_Worker
             rb_ko_yes.Checked = false;
             rb_ko_no.Checked = false;
         }
+
+        public IDoc_TTN_INFO INFO()
+        {
+            byte LWH = 0;
+
+            IDoc_TTN_INFO _ans = new IDoc_TTN_INFO
+            {
+                Date = dateTime.Value,
+                Cost = tb_cost.Text.Trim(),
+                ControlOplaty = tb_ko.Text.Trim(),
+                Payer = (cb_payer.SelectedItem as PayerInfo)?.Value,
+                Comm = tb_comm.Text.Trim(),
+                Seat = new OptionsSeat
+                {
+                    volumetricLength = byte.TryParse(tbPakLeng.Text.Trim(), out LWH) ? LWH : byte.MinValue,
+                    volumetricWidth = byte.TryParse(tbPakWidth.Text.Trim(), out LWH) ? LWH : byte.MinValue,
+                    volumetricHeight = byte.TryParse(tbPakHeig.Text.Trim(), out LWH) ? LWH : byte.MinValue,
+                    weight = tb_weight.Text.Trim()
+                },
+                Weight = tb_weight.Text.Trim(),
+                RecepientCitiRef = (cbCityList.SelectedItem as NP_CityInfo)?.Ref,
+                RecepientWarehouse = (cb_Warehouses.SelectedItem as WrhInfo)?.Ref
+            };
+
+            return _ans;
+        }
+
+        private bool Verification()
+        {
+            if (!rb_ko_yes.Checked && !rb_ko_no.Checked) return false; 
+
+            string[] _tb = new string[] 
+            {
+                tb_cost.Text,
+                tb_ko.Text,
+                tbPakLeng.Text,
+                tbPakWidth.Text,
+                tbPakHeig.Text,
+                tb_weight.Text
+            };
+            
+            foreach (string _temp in _tb)
+            {
+                if (!float.TryParse(_temp, out _)) return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(tb_comm.Text)) return false;
+
+            if (cbCityList.SelectedIndex == -1) return false;
+            if (cb_Warehouses.SelectedIndex == -1) return false;
+
+            return true;
+        }
+
+        private void but_search_Click(object sender, EventArgs e)
+        {
+            SetAddres();
+        }
+
+        private void SetAddres()
+        {
+            cbCityList.Items.Clear();
+            cb_Warehouses.Items.Clear();
+
+            if (tb_CitySearch.Text.TrimStart().Length < 3
+                || string.IsNullOrWhiteSpace(tb_CitySearch.Text)) return;
+
+            AddressParts find = AddressParts.Parse(tb_CitySearch.Text);
+
+            if (find.Number == null || !int.TryParse(find.Number, out WarehouseNumber))
+            {
+                WarehouseNumber = 0;
+            }
+
+            List<NP_CityInfo> _cities = NP.FindByCityName(find.CityName, NovaPoshta.FindIn.LocalCitiFile);
+
+            List<FindedCiti> _fullCities = _cities.Select(c => FindedCiti.FromBase(c)).ToList();
+
+            if (find.Oblast != null)
+            {
+                _fullCities = _fullCities.Where(c => c.AreaDescription.ToLower()
+                    .Contains(find.Oblast.ToLower()))
+                    .ToList();
+            }
+
+            cbCityList.Items.AddRange(_fullCities.ToArray());
+
+            if (cbCityList.Items.Count > 0)
+            {
+                cbCityList.SelectedIndex = 0;
+            }
+        }
     }
 
     public class PayerInfo
     {
         public string Value { get; set; }
         public string Name { get; set; }
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
+
+    public class IDoc_TTN_INFO {
+        public DateTime Date;
+        public string Cost;
+        public string ControlOplaty;
+        public string Payer;
+        public string Comm;
+        public OptionsSeat Seat;
+        public string Weight;
+        public string RecepientCitiRef;
+        public string RecepientWarehouse;
+    }
+
 }

@@ -15,7 +15,7 @@ namespace SPM_Worker
         public AddressParts ANSWER { get {
                 AddressParts _out = new AddressParts();
                 WrhInfo _wrh = (WrhInfo)(cb_vidd.SelectedItem);
-                _out.Number = _wrh != null ? _wrh.NUMBER.ToString() 
+                _out.Number = _wrh != null ? _wrh.NUMBER 
                     : (tb_number.Text.Trim() != string.Empty ? tb_number.Text.Trim():null);
 
                 NP_CityInfo _city = (NP_CityInfo)cb_city.SelectedItem;
@@ -516,7 +516,7 @@ namespace SPM_Worker
         {
             WrhInfo _wrh = (WrhInfo)cb_vidd.SelectedItem;
 
-            tb_number.Text = _wrh.NUMBER.ToString();
+            tb_number.Text = _wrh.NUMBER;
         }
 
         private void tb_number_Enter(object sender, EventArgs e)
@@ -535,7 +535,7 @@ namespace SPM_Worker
             {
                 foreach (WrhInfo _w in cb_vidd.Items)
                 {
-                    if (_w.NUMBER == _temp)
+                    if (_w.NUMBER == _temp.ToString())
                     {
                         cb_vidd.SelectedItem = _w;
                         break;
@@ -547,39 +547,6 @@ namespace SPM_Worker
                 tb_number.Text = "";
                 tb_number.Focus();
             }
-        }
-    }
-
-    class FindedCiti:NP_CityInfo
-    {
-        public static implicit operator FindedCiti(AddressParts _other)
-        {
-            return new FindedCiti
-            {
-                Description = _other.CityName,
-                AreaDescription = _other.Oblast,
-                RegionsDescription = _other.Rajon,
-                SettlementTypeDescription = _other.CityType
-            };
-        }
-        public static FindedCiti FromBase(NP_CityInfo city)
-        {
-            return new FindedCiti
-            {
-                Ref = city.Ref,
-                SettlementType = city.SettlementType,
-                Description = city.Description,
-                SettlementTypeDescription = city.SettlementTypeDescription,
-                Region = city.Region,
-                RegionsDescription = city.RegionsDescription,
-                AreaDescription = city.AreaDescription
-            };
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + " | " + AreaDescription + " обл." 
-                + (!string.IsNullOrEmpty(RegionsDescription) ? " | " + RegionsDescription + " р-н" : "");
         }
     }
     

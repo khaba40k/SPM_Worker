@@ -1,7 +1,9 @@
-﻿using SPM_Core;
+﻿using API_NovaPoshta;
+using SPM_Core;
 using SPM_print;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -138,15 +140,16 @@ namespace SPM_Worker
         {
             ZAKAZ _inf = (ZAKAZ)sender;
             PrintType toPrint = PrintType.EMPTY;
+            CreateDocumentJsonAnswer TTN_OUT_JSON_ANSWER = null;
 
             if (e.STATUS == Z_STATUS.NEW)
             {
-                using (MoveForm _form = new MoveForm(new string[] { "ТТН (вхідна)" }))
+                using (MoveForm _form = new MoveForm(_inf))
                 {
                     if (_form.ShowDialog() == DialogResult.OK)
                     {
-                        _inf.TTN_IN = !string.IsNullOrWhiteSpace(_form.VALUE0)
-                            ? _form.VALUE0.Trim()
+                        _inf.TTN_IN = !string.IsNullOrWhiteSpace(_form.TTN)
+                            ? _form.TTN.Trim()
                             : null;
 
                         SOME_CHANGED = _inf.TTN_IN != null;
@@ -156,39 +159,93 @@ namespace SPM_Worker
             }
             else
             {
-                using (MoveForm _form1 = new MoveForm(new string[] {
-                            "Працівник",
-                            "Створити накладну",
-                            "Сума (факт)"
-                        }, new string[] {
-                            _inf.WORKER,
-                            _inf.TTN_OUT,
-                            _inf.SUM.ToString()
-                        }, _inf.REQV ?? ""))
+                using (MoveForm _form1 = new MoveForm(_inf))
                 {
                     if (_form1.ShowDialog() == DialogResult.OK)
                     {
-                        _inf.WORKER = 
-                            !string.IsNullOrWhiteSpace(_form1.VALUE0)
-                            ? _form1.VALUE0.Trim()
+                        _inf.WORKER =
+                            !string.IsNullOrWhiteSpace(_form1.WORKER)
+                            ? _form1.WORKER.Trim()
                             : null;
 
-                        _inf.TTN_OUT = !string.IsNullOrWhiteSpace(_form1.VALUE1)
-                        ? _form1.VALUE1.Trim()
-                        : null;
-
-                        _inf.SUM = TEXT_TO._FLOAT(_form1.VALUE2);
+                        _inf.SUM = TEXT_TO._FLOAT(_form1.COST);
 
                         _inf.DATE_OUT = DateTime.Now;
 
-                        SOME_CHANGED = _inf.TTN_OUT != null;
-                        toPrint = SOME_CHANGED ? PrintType.Short : PrintType.EMPTY;
+                        if (_form1.TTN_INFO != null)
+                        {
+                            //Створюємо накладну
+
+                            using (NovaPoshta NP = new NovaPoshta("4c0e5cf1a2509ca7880c979a68b986a8",
+                                  Path.Combine(Environment
+                                  .GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                  "spm", "NP")))
+                            {
+                                string _phone = _inf.PHONE;
+
+                                string[] Names = _inf.CLIENT_NAME.Split(new char[] { ' ' }, 3);
+
+                                CreateContactJsonAnswer _newRecepient =
+                                    NP.CreateRecepient(ref _phone, Names[0], Names[1], Names.Length > 2 ? Names[2] : "");
+
+                                IDoc_TTN_INFO form_info = _form1.TTN_INFO;
+
+                                CreateDocumentParams ttn_params =
+                                    new CreateDocumentParams(_newRecepient, _phone)
+                                    {
+                                        PayerType = form_info.Payer,
+                                        OptionsSeat = new List<OptionsSeat> { form_info.Seat },
+                                        Weight = float.Parse(form_info.Weight),
+                                        Description = form_info.Comm,
+                                        Cost = float.Parse(form_info.Cost),
+                                        AfterpaymentOnGoodsCost = float.Parse(form_info.ControlOplaty),
+                                        DateTime = form_info.Date,
+                                        CityRecipient = form_info.RecepientCitiRef,
+                                        RecipientAddress = form_info.RecepientWarehouse
+                                    };
+
+                                TTN_OUT_JSON_ANSWER = NP.CreateDocument(ttn_params);
+
+                                if (TTN_OUT_JSON_ANSWER != null
+                                    && TTN_OUT_JSON_ANSWER.success
+                                    && TTN_OUT_JSON_ANSWER.data.Count > 0)
+                                {
+                                    _inf.TTN_OUT = TTN_OUT_JSON_ANSWER.data[0].IntDocNumber;
+
+                                    SOME_CHANGED = _inf.TTN_OUT != null;
+
+                                    toPrint = SOME_CHANGED ? PrintType.Short : PrintType.EMPTY;
+                                }
+                                else
+                                {
+                                    SOME_CHANGED = false;
+                                    _inf.TTN_OUT = null;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            _inf.TTN_OUT = string.Empty;
+                        }
                     }
                 }
             }
 
-            if (SOME_CHANGED && SERVICE_INFO.SAVE_ZAKAZ(_inf, out string mes))
+            if (SOME_CHANGED && SERVICE_INFO.SAVE_ZAKAZ(ref _inf, out string mes))
             {
+                if (!string.IsNullOrWhiteSpace(_inf.TTN_OUT) 
+                    && TTN_OUT_JSON_ANSWER != null)
+                {
+                    CreatedDocumentInfo _ttn = TTN_OUT_JSON_ANSWER.data[0];
+
+                    mes += $"\n\nСтворено накладну №{_ttn.IntDocNumber}"
+                        + $"\nВартість доставки: {_ttn.CostOnSite}";
+
+                    string token = "4c0e5cf1a2509ca7880c979a68b986a8";
+
+                    Process.Start($"https://my.novaposhta.ua/orders/printMarking100x100/orders/{_ttn.IntDocNumber}/type/pdf/zebra/zebra/apiKey/{token}");
+                }
+
                 if (toPrint == PrintType.EMPTY)
                 {
                     CustomMessage.Show(mes, "Статус",

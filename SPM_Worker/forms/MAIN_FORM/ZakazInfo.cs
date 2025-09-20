@@ -1,7 +1,10 @@
-﻿using SPM_Core;
+﻿using API_NovaPoshta;
+using SPM_Core;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -422,20 +425,14 @@ namespace SPM_Worker
 
         public override bool Equals(object obj) => Equals(obj as ZakazInfo);
 
-        public override int GetHashCode()
-        {
-            return INFO?.GetHashCode() ?? 0;
-        }
+        public override int GetHashCode() => INFO?.GetHashCode() ?? 0;
 
         private void cmWriteZakaz_Click(object sender, EventArgs e)
         {
             WriteZakaz?.Invoke(INFO, new ZakazEventArgs(INFO.ID));
         }
 
-        private void cmPrint_Click(object sender, EventArgs e)
-        {
-            PrintZakaz?.Invoke(this, 0);
-        }
+        private void cmPrint_Click(object sender, EventArgs e) => PrintZakaz?.Invoke(this, 0);
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -501,6 +498,78 @@ namespace SPM_Worker
         public override string ToString()
         {
             return INFO.STATUS + " " + INFO.TYPE + " " + INFO.CLIENT_NAME.Split(' ')[0];
+        }
+
+        private void zakazContext_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(INFO.TTN_OUT) && INFO.TTN_OUT.Length > 10)
+            {
+                np_tsmi.Visible = true;
+                ts_npSeparator.Visible = true;
+            }
+        }
+
+        private void delete_ttn_Click(object sender, EventArgs e)
+        {
+            string question = "Повернути заявку в роботу та/або видалити ТТН?";
+
+            DialogResult _ans = CustomMessage.Show(question, "Зміна заявки",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Exclamation,
+                new MessButText { Yes = "Видалити ТТН", No = "< В роботу" });
+
+            bool removeDoc = false;
+            string docNumber = _curInfo.TTN_OUT ?? "";
+
+            if (DialogResult.Yes == _ans)
+            {
+                _curInfo.TTN_OUT = "";
+
+                SERVICE_INFO.SAVE_ZAKAZ(ref _curInfo, out _);
+
+                removeDoc = true;
+            }
+            else if (_ans == DialogResult.No)
+            {
+                _curInfo.TTN_OUT = null;
+                _curInfo.DATE_OUT = null;
+
+                SERVICE_INFO.SAVE_ZAKAZ(ref _curInfo, out _);
+
+                removeDoc = true;
+            }
+
+            if (removeDoc)
+            {
+                using (NovaPoshta NP = new NovaPoshta("4c0e5cf1a2509ca7880c979a68b986a8",
+                       Path.Combine(Environment
+                       .GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                       "spm", "NP")))
+                {
+                    if (NP.RemoveDocument(docNumber))
+                    {
+                        CustomMessage.Show($"Накладна №{docNumber} вдало видалена.");
+                    }
+                }
+            }
+        }
+
+        private void print_ttn_zebra_Click(object sender, EventArgs e)
+        {
+            string token = "4c0e5cf1a2509ca7880c979a68b986a8";
+
+            string number = _curInfo.TTN_OUT;
+
+            Process.Start($"https://my.novaposhta.ua/orders/printMarking100x100/orders/{number}/type/pdf/zebra/zebra/apiKey/{token}");
+        }
+
+        private void print_ttn_Document_Click(object sender, EventArgs e)
+        {
+            string token = "4c0e5cf1a2509ca7880c979a68b986a8";
+
+            string number = _curInfo.TTN_OUT;
+
+            Process.Start($"https://my.novaposhta.ua/orders/printDocument/orders[]/{number}/type/pdf/apiKey/{token}");
         }
     }
 

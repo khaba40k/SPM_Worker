@@ -125,7 +125,7 @@ namespace SPM_Worker
 
                 //ЗАПИС В БАЗУ
 
-                if (SERVICE_INFO.SAVE_ZAKAZ(OUT, out string message))
+                if (SERVICE_INFO.SAVE_ZAKAZ(ref OUT, out string message))
                 {
                     CustomMessage.Show(message,
                     "Статус",

@@ -284,6 +284,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="res\img\Search.png" />
     <EmbeddedResource Include="res\img\Save.png" />
     <EmbeddedResource Include="res\img\sold_type.png" />
     <EmbeddedResource Include="res\img\pereobl_type.png" />

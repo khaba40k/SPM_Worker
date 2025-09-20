@@ -42,10 +42,16 @@ namespace SPM_Worker
             this.cmShablon = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.cmPrint = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.ts_npSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.cmDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.zakazContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.np_tsmi = new System.Windows.Forms.ToolStripMenuItem();
+            this.print_ttn_zebra = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.delete_ttn = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.print_ttn_Document = new System.Windows.Forms.ToolStripMenuItem();
             this.zakazContext.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -158,10 +164,11 @@ namespace SPM_Worker
             this.cmPrint.Text = "Друкувати | CTRL + P";
             this.cmPrint.Click += new System.EventHandler(this.cmPrint_Click);
             // 
-            // toolStripSeparator1
+            // ts_npSeparator
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
+            this.ts_npSeparator.Name = "ts_npSeparator";
+            this.ts_npSeparator.Size = new System.Drawing.Size(221, 6);
+            this.ts_npSeparator.Visible = false;
             // 
             // cmDelete
             // 
@@ -181,16 +188,66 @@ namespace SPM_Worker
             this.toolStripSeparator4,
             this.cmShablon,
             this.cmPrint,
-            this.toolStripSeparator1,
+            this.ts_npSeparator,
+            this.np_tsmi,
+            this.toolStripSeparator5,
             this.cmDelete});
             this.zakazContext.Name = "zakazContext";
             this.zakazContext.ShowItemToolTips = false;
-            this.zakazContext.Size = new System.Drawing.Size(225, 120);
+            this.zakazContext.Size = new System.Drawing.Size(225, 180);
+            this.zakazContext.Opening += new System.ComponentModel.CancelEventHandler(this.zakazContext_Opening);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(221, 6);
+            // 
+            // np_tsmi
+            // 
+            this.np_tsmi.BackColor = System.Drawing.Color.Red;
+            this.np_tsmi.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.print_ttn_zebra,
+            this.print_ttn_Document,
+            this.toolStripSeparator1,
+            this.delete_ttn});
+            this.np_tsmi.ForeColor = System.Drawing.Color.White;
+            this.np_tsmi.Name = "np_tsmi";
+            this.np_tsmi.Size = new System.Drawing.Size(224, 26);
+            this.np_tsmi.Text = "Нова Пошта";
+            this.np_tsmi.Visible = false;
+            // 
+            // print_ttn_zebra
+            // 
+            this.print_ttn_zebra.Name = "print_ttn_zebra";
+            this.print_ttn_zebra.Size = new System.Drawing.Size(245, 26);
+            this.print_ttn_zebra.Text = "Друкувати ТТН (zebra)";
+            this.print_ttn_zebra.Click += new System.EventHandler(this.print_ttn_zebra_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(242, 6);
+            // 
+            // delete_ttn
+            // 
+            this.delete_ttn.ForeColor = System.Drawing.Color.Red;
+            this.delete_ttn.Image = global::SPM_Worker.Properties.Resources.img_del;
+            this.delete_ttn.Name = "delete_ttn";
+            this.delete_ttn.Size = new System.Drawing.Size(245, 26);
+            this.delete_ttn.Text = "Видалити ТТН";
+            this.delete_ttn.Click += new System.EventHandler(this.delete_ttn_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(221, 6);
+            // 
+            // print_ttn_Document
+            // 
+            this.print_ttn_Document.Name = "print_ttn_Document";
+            this.print_ttn_Document.Size = new System.Drawing.Size(245, 26);
+            this.print_ttn_Document.Text = "Друкувати ЕН";
+            this.print_ttn_Document.Click += new System.EventHandler(this.print_ttn_Document_Click);
             // 
             // ZakazInfo
             // 
@@ -222,10 +279,16 @@ namespace SPM_Worker
         private System.Windows.Forms.ToolStripMenuItem cmPrint;
         private System.Windows.Forms.ToolStripMenuItem cmPrintFromWorker;
         private System.Windows.Forms.ToolStripMenuItem cmPrintShort;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator ts_npSeparator;
         private System.Windows.Forms.ToolStripMenuItem cmDelete;
         private System.Windows.Forms.ContextMenuStrip zakazContext;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem np_tsmi;
+        private System.Windows.Forms.ToolStripMenuItem print_ttn_zebra;
+        private System.Windows.Forms.ToolStripMenuItem delete_ttn;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem print_ttn_Document;
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web.Script.Serialization;
 using File = System.IO.File;
 
@@ -33,6 +34,8 @@ namespace API_NovaPoshta
         private JavaScriptSerializer SERIALIZER = new JavaScriptSerializer();
         public NovaPoshta(string token, string cashPath)
         {
+            SERIALIZER.MaxJsonLength = int.MaxValue;
+
             TOKEN = token;
             CASH_PATH = Path.GetFullPath(cashPath);
             AREAS = GetAreasList();
@@ -47,12 +50,15 @@ namespace API_NovaPoshta
         {
             if (!DeSerializeIfActual(FILENAME_AREAS_CASH, out NP_Descr_Ref[] _answer, 0))
             {
-                string jsonRequest = $@"{{
-                ""modelName"": ""AddressGeneral"",
-                ""calledMethod"": ""getSettlementAreas"",
-                ""methodProperties"": {{}},
-                ""apiKey"": ""{TOKEN}""
-                }}";
+                var json = new
+                {
+                    modelName = "AddressGeneral",
+                    calledMethod = "getSettlementAreas",
+                    methodProperties = new { },
+                    apiKey = TOKEN
+                };
+
+                string jsonRequest = JsonConvert.SerializeObject(json);
 
                 WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json";
 
@@ -110,24 +116,30 @@ namespace API_NovaPoshta
                 if (_temp == null) break;
 
                 _ans.data.AddRange(_temp);
+
+                Thread.Sleep(30);
             }
 
-            SaveToJsonFile(areaRef, _ans);
+            if (_ans.data.Count > 0) SaveToJsonFile(areaRef, _ans);
         }
 
         private List<NP_CityInfo> GetAreasWeb(string areaRef, int _page)
         {
-            string jsonRequest = $@"{{
-                ""modelName"": ""AddressGeneral"",
-                ""calledMethod"": ""getSettlements"",
-                ""methodProperties"": {{
-                    ""AreaRef"": ""{areaRef}"",
-                    ""Warehouse"": 1,
-                    ""Limit"": ""500"",
-                    ""Page"": ""{_page}""
-                }},
-                ""apiKey"": ""{TOKEN}""
-                }}";
+            var json = new
+            {
+                modelName = "AddressGeneral",
+                calledMethod = "getSettlements",
+                methodProperties = new
+                {
+                    AreaRef = areaRef,
+                    Warehouse = 1,
+                    Limit = "500",
+                    Page = _page.ToString()
+                },
+                apiKey = TOKEN
+            };
+
+            string jsonRequest = JsonConvert.SerializeObject(json);
 
             WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json";
             try
@@ -215,20 +227,22 @@ namespace API_NovaPoshta
 
             try
             {
-                NP_CITIES_TO_WH _temp;
+                var json = new
+                {
+                    modelName = "AddressGeneral",
+                    calledMethod = "getCities",
+                    methodProperties = new
+                    {
+                        Limit = "500",
+                        Page = page.ToString()
+                    },
+                    apiKey = TOKEN
+                };
 
-                string jsonRequest = $@"{{
-                    ""modelName"": ""AddressGeneral"",
-                    ""calledMethod"": ""getCities"",
-                    ""methodProperties"": {{
-                        ""Limit"": ""500"",
-                        ""Page"": ""{page}""
-                    }},
-                    ""apiKey"": ""{TOKEN}""
-                }}";
+                string jsonRequest = JsonConvert.SerializeObject(json);
 
                 string response = WEB_CLIENT.UploadString(API_URL, "POST", jsonRequest);
-                _temp = SERIALIZER.Deserialize<NP_CITIES_TO_WH>(response);
+                NP_CITIES_TO_WH _temp = SERIALIZER.Deserialize<NP_CITIES_TO_WH>(response);
 
                 if (_temp == null || _temp.data == null || _temp.data.Count == 0)
                     return null;
@@ -271,14 +285,18 @@ namespace API_NovaPoshta
 
             if (_cities.Count != 1) return null;
 
-            string jsonRequest = $@"{{
-                ""modelName"": ""AddressGeneral"",
-                ""calledMethod"": ""getWarehouses"",
-                ""methodProperties"": {{
-                    ""CityRef"": ""{_cities[0].Ref}""
-                }},
-                ""apiKey"": ""{TOKEN}""
-                }}";
+            var json = new
+            {
+                modelName = "AddressGeneral",
+                calledMethod = "getWarehouses",
+                methodProperties = new
+                {
+                    CityRef = _cities[0].Ref
+                },
+                apiKey = TOKEN
+            };
+
+            string jsonRequest = JsonConvert.SerializeObject(json);
 
             WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
 
@@ -287,23 +305,27 @@ namespace API_NovaPoshta
                 string response = WEB_CLIENT.UploadString(API_URL, "POST", jsonRequest);
                 WarehouseList _warehouses = SERIALIZER.Deserialize<WarehouseList>(response);
 
-                _warehouses.data.Sort((w1, w2) => w1.NUMBER.CompareTo(w2.NUMBER));
+                _warehouses.data.Sort((w1, w2) => w1.intNUMBER.CompareTo(w2.intNUMBER));
 
                 return _warehouses.data;
             }
             catch { return null; }
         }
 
-        public List<WrhInfo> GetWarehouseList(string CityRef)
+        public List<WrhInfo> GetWarehouseList(string cityRef)
         {
-            string jsonRequest = $@"{{
-                ""modelName"": ""AddressGeneral"",
-                ""calledMethod"": ""getWarehouses"",
-                ""methodProperties"": {{
-                    ""CityRef"": ""{CityRef}""
-                }},
-                ""apiKey"": ""{TOKEN}""
-                }}";
+            var json = new
+            {
+                modelName = "AddressGeneral",
+                calledMethod = "getWarehouses",
+                methodProperties = new
+                {
+                    CityRef = cityRef
+                },
+                apiKey = TOKEN
+            };
+
+            string jsonRequest = JsonConvert.SerializeObject(json);
 
             WEB_CLIENT.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
 
@@ -312,11 +334,14 @@ namespace API_NovaPoshta
                 string response = WEB_CLIENT.UploadString(API_URL, "POST", jsonRequest);
                 WarehouseList _warehouses = SERIALIZER.Deserialize<WarehouseList>(response);
 
-                _warehouses.data.Sort((w1, w2) => w1.NUMBER.CompareTo(w2.NUMBER));
+                _warehouses.data.Sort((w1, w2) => w1.intNUMBER.CompareTo(w2.intNUMBER));
 
                 return _warehouses.data;
             }
-            catch { return null; }
+            catch (Exception ex) {
+                string err = ex.Message;
+                return null;
+            }
         }
 
         /// <summary>
@@ -469,14 +494,6 @@ namespace API_NovaPoshta
 
         private bool Is_Exist(string fileName) => File.Exists(Path.Combine(CASH_PATH, fileName));
 
-        private string GetPrivatePersonCounterparty()
-        {
-
-
-
-            return "";
-        }
-
         private bool Is_Actual(string fileFullPath, byte days)
         {
             if (!File.Exists(fileFullPath)) return false;
@@ -540,18 +557,93 @@ namespace API_NovaPoshta
             }
         }
 
-        public List<CreatedDocumentInfo> CreateDocument(CreateDocumentParams _input)
+        public CreateDocumentJsonAnswer CreateDocument(CreateDocumentParams _input)
         {
             _input.TOKEN = TOKEN;
 
+            try
+            {
+                string response = WEB_CLIENT.UploadString(API_URL, _input.ToString());
 
-            return null;
+                return SERIALIZER.Deserialize<CreateDocumentJsonAnswer>(response);
+            }
+            catch (Exception ex)
+            {
+                string err = ex.Message;
+
+                return null;
+            }
         }
 
-        public string TEST(CreateDocumentParams _input)
+        public List<DocumentInfo> GetDocumentList(DateTime _before, bool andArchive = false)
         {
-            return _input.ToString();
+            var request = new
+            {
+                apiKey = TOKEN,
+                modelName = "InternetDocument",
+                calledMethod = "getDocumentList",
+                methodProperties = new
+                {
+                    DateTimeFrom = _before.AddDays(-90).ToShortDateString(),
+                    DateTimeTo = _before.ToShortDateString(),
+                    Page = "1",
+                    GetFullList = andArchive ? 1 : 0
+                }
+            };
+
+            string stringRequest = JsonConvert.SerializeObject(request);
+
+            string response = WEB_CLIENT.UploadString(API_URL, stringRequest);
+
+            var jsonAns = new
+            {
+                success = false,
+                data = new List<DocumentInfo>()
+            };
+
+            jsonAns = JsonConvert.DeserializeAnonymousType(response, jsonAns);
+
+            return jsonAns.success ? jsonAns.data:null;
         }
+
+        public bool RemoveDocument(string intNumber)
+        {
+            List<DocumentInfo> _docs = GetDocumentList(DateTime.Now);
+
+            if (_docs == null || _docs.Count == 0)
+            {
+                return false;
+            }
+
+            DocumentInfo _doc = _docs.Find(d=>d.IntDocNumber == intNumber);
+
+            if (_doc == null) return false;
+
+            var request = new
+            {
+                apiKey = TOKEN,
+                modelName = "InternetDocumentGeneral",
+                calledMethod = "delete",
+                methodProperties = new
+                {
+                    DocumentRefs = _doc.Ref
+                }
+            };
+
+            string stringRequest = JsonConvert.SerializeObject(request);
+
+            string response = WEB_CLIENT.UploadString(API_URL, stringRequest);
+
+            var jsonAns = new
+            {
+                success = false
+            };
+
+            jsonAns = JsonConvert.DeserializeAnonymousType(response, jsonAns);
+
+            return jsonAns.success;
+        }
+
 
         public void Dispose() => WEB_CLIENT?.Dispose();
     }
@@ -817,8 +909,7 @@ namespace API_NovaPoshta
             foreach (NP_CityInfo _one in data)
             {
                 if (!_one.Description.ToLower().Contains(_findString)
-                    && (_one.AreaDescription.ToLower().Contains(_findString)
-                    || _one.RegionsDescription.ToLower().Contains(_findString)))
+                    && (_one.AreaDescription.ToLower().Contains(_findString)))
                 {
                     _out.Add(_one);
                 }
@@ -856,7 +947,7 @@ namespace API_NovaPoshta
         public string RegionsDescription { get; set; }
         public override string ToString()
         {
-            return (ConvertCityType() + " " + RemoweScob(base.ToString())).Trim();
+            return (ConvertCityType() + " " + RemoweScob(base.ToString())).TrimEnd();
         }
 
         private string ConvertCityType()
@@ -888,6 +979,39 @@ namespace API_NovaPoshta
         }
     }
 
+    public class FindedCiti : NP_CityInfo
+    {
+        public static implicit operator FindedCiti(AddressParts _other)
+        {
+            return new FindedCiti
+            {
+                Description = _other.CityName,
+                AreaDescription = _other.Oblast,
+                RegionsDescription = _other.Rajon,
+                SettlementTypeDescription = _other.CityType
+            };
+        }
+        public static FindedCiti FromBase(NP_CityInfo city)
+        {
+            return new FindedCiti
+            {
+                Ref = city.Ref,
+                SettlementType = city.SettlementType,
+                Description = city.Description,
+                SettlementTypeDescription = city.SettlementTypeDescription,
+                Region = city.Region,
+                RegionsDescription = city.RegionsDescription,
+                AreaDescription = city.AreaDescription
+            };
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + " | " + AreaDescription + " обл."
+                + (!string.IsNullOrEmpty(RegionsDescription) ? " | " + RegionsDescription + " р-н" : "");
+        }
+    }
+
     public class WarehouseList
     {
         public List<WrhInfo> data { get; set; }
@@ -895,11 +1019,14 @@ namespace API_NovaPoshta
 
     public class WrhInfo
     {
+        public string Ref { get; set; }
         public string Description { get; set; }
-        public int NUMBER { get; set; }
-        public override string ToString()
-        {
-            return NUMBER + ") " + Description;
+        public string NUMBER { get; set; }
+        public int intNUMBER => int.Parse(NUMBER);
+        public override string ToString() {
+            string _out = Description.Replace("\"Нова Пошта\"", "НП");
+            _out = _out.Replace($" №{NUMBER}:", ":");
+            return NUMBER + ") " + _out;
         }
     }
 
@@ -930,7 +1057,6 @@ namespace API_NovaPoshta
     public class CreateDocumentParams
     {
         public string TOKEN { get; set; }
-
         public CreateDocumentParams(CreateContactJsonAnswer _recepientInfo, string Phone)
         {
             RecipientsPhone = Phone;
@@ -944,7 +1070,7 @@ namespace API_NovaPoshta
         public byte SeatsAmount => (byte)OptionsSeat.Count;
         public List<OptionsSeat> OptionsSeat { get; set; } = new List<OptionsSeat>();
         public float Weight { get; set; }
-        public float TotalSeatsWeigth => OptionsSeat.Sum(op => op.weigth);
+        public float TotalSeatsWeigth => OptionsSeat.Sum(op => op.Weight);
         public string ServiceType { get; set; } = "WarehouseWarehouse";
         public string Description { get; set; } = "Шолом";
         public float Cost { get; set; }
@@ -956,50 +1082,49 @@ namespace API_NovaPoshta
         public string SenderAddress { get; set; } = "8b06dbb3-0ac5-11e5-8a92-005056887b8d";
         public string SendersPhone { get; set; } = "380953410218";
 
-        private string CityRecipient { get; set; }
-        private string RecipientAddress { get; set; }
+        public string CityRecipient { get; set; }
+        public string RecipientAddress { get; set; }
         private string RecipientsPhone { get; set; }
         private string Recipient { get; set; }
         private string ContactRecipient { get; set; }
 
-        private const string modelName = "InternetDocument";
-        private const string calledMethod = "save";
-
-        private string methodProperties()
-        {
-            return string.Join(",\n\t",
-                "\t\"PayerType\": \"" + PayerType + "\"",
-                "\"PaymentMethod\": \"" + PaymentMethod + "\"",
-                "\"CargoType\": \"" + CargoType + "\"",
-                "\"SeatsAmount\": \"" + SeatsAmount + "\"",
-                "\"Weight\": \"" + Weight + "\"",
-                "\"ServiceType\": \"" + ServiceType + "\"",
-                "\"Description\": \"" + Description + "\"",
-                "\"Cost\": \"" + Cost + "\"",
-                "\"AfterpaymentOnGoodsCost\": \"" + AfterpaymentOnGoodsCost + "\"",
-                "\"DateTime\": \"" + DateTime.ToShortDateString() + "\"",
-                "\"CitySender\": \"" + CitySender + "\"",
-                "\"Sender\": \"" + Sender + "\"",
-                "\"ContactSender\": \"" + ContactSender + "\"",
-                "\"SenderAddress\": \"" + SenderAddress + "\"",
-                "\"SendersPhone\": \"" + SendersPhone + "\"",
-                "\"CityRecipient\": \"" + CityRecipient + "\"",
-                "\"RecipientAddress\": \"" + RecipientAddress + "\"",
-                "\"RecipientsPhone\": \"" + RecipientsPhone + "\"",
-                "\"Recipient\": \"" + Recipient + "\"",
-                "\"ContactRecipient\": \"" + ContactRecipient + "\"",
-                "\"OptionsSeat\": \n\t[\n\t" + string.Join(",\n\t", OptionsSeat) + "\n\t]"
-                );
-        }
+        private const string MODELNAME = "InternetDocument";
+        private const string CALLEDMETHOD = "save";
 
         public override string ToString()
         {
-            return "{\n" + string.Join(",\n",
-                "\"apiKey\": \"" + TOKEN + "\"",
-                "\"modelName\": \"" + modelName + "\"",
-                "\"calledMethod\": \"" + calledMethod + "\"",
-                "\"methodProperties\": \n\t{\n" + methodProperties() + "\n\t}"
-                ) + "\n}";
+            var json = new
+            {
+                apiKey = TOKEN,
+                modelName = MODELNAME,
+                calledMethod = CALLEDMETHOD,
+                methodProperties = new
+                {
+                    PayerType = PayerType,
+                    PaymentMethod = PaymentMethod,
+                    CargoType = CargoType,
+                    SeatsAmount = SeatsAmount,
+                    Weight = Weight.ToString(),
+                    ServiceType = ServiceType,
+                    Description = Description,
+                    Cost = Cost.ToString(),
+                    AfterpaymentOnGoodsCost = AfterpaymentOnGoodsCost.ToString(),
+                    DateTime = DateTime.ToShortDateString(),
+                    CitySender = CitySender,
+                    Sender = Sender,
+                    ContactSender = ContactSender,
+                    SenderAddress = SenderAddress,
+                    SendersPhone = SendersPhone,
+                    CityRecipient = CityRecipient,
+                    RecipientAddress = RecipientAddress,
+                    RecipientsPhone = RecipientsPhone,
+                    Recipient = Recipient,
+                    ContactRecipient = ContactRecipient,
+                    OptionsSeat = OptionsSeat.ToArray()
+                }
+            };
+
+            return JsonConvert.SerializeObject(json, Formatting.Indented);
         }
     }
 
@@ -1014,27 +1139,19 @@ namespace API_NovaPoshta
         public OptionsSeat(string label, byte L, byte W, byte H)
         {
             LABEL = label ?? "";
-            Length = L;
-            Width = W;
-            Height = H;
+            volumetricLength = L;
+            volumetricWidth = W;
+            volumetricHeight = H;
         }
 
-        public byte Length { get; set; }
-        public byte Width { get; set; }
-        public byte Height { get; set; }
-        public float weigth => (Length * Width * Height) / 4000f;
+        public byte volumetricLength { get; set; }
+        public byte volumetricWidth { get; set; }
+        public byte volumetricHeight { get; set; }
+        public float Weight => (volumetricLength * volumetricWidth * volumetricHeight) / 4000f;
+        public string weight { get; set; }
         public override string ToString()
         {
-            return (LABEL + "  " + string.Join(" * ", Length, Width, Height)).TrimStart();
-        }
-
-        public string ToJSON()
-        {
-            return "\t{\n" + string.Join(",\n\t\t",
-                "\t\t\"volumetricLength\": " + Length,
-                "\"volumetricWidth\": " + Width,
-                "\"volumetricHeight\": " + Height
-                ) + "\n\t\t}";
+            return (LABEL + "  " + string.Join("*", volumetricLength, volumetricWidth, volumetricHeight)).TrimStart();
         }
     }
     /// <summary>
@@ -1098,7 +1215,7 @@ namespace API_NovaPoshta
     {
         public string Ref { get; set; }
         public float CostOnSite { get; set; }
-        public DateTime EstimatedDeliveryDate { get; set; }
+        public string EstimatedDeliveryDate { get; set; }
         public string IntDocNumber { get; set; }
         public string TypeDocument { get; set; }
     }
@@ -1107,5 +1224,21 @@ namespace API_NovaPoshta
     {
         public string CityRef { get; set; }
         public string WarehouseRef { get; set; }
+    }
+
+    public class DocumentInfo
+    {
+        public string Ref { get; set; }
+        public string IntDocNumber { get; set; }
+        public byte SeatsAmount { get; set; }
+        public string Weight { get; set; }
+        public DateTime DateTime { get; set; }
+        public string Cost {  get; set; }
+        public string Description { get; set; }
+        public string RecipientsPhone { get; set; }
+        public string StateName { get; set; }
+        public string RecipientContactPerson { get; set; }
+        public string CityRecipientDescription { get; set; }
+        public string RecipientAddressDescription { get; set; }
     }
 }

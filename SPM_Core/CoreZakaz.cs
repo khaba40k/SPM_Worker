@@ -89,7 +89,7 @@ namespace SPM_Core
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(TTN_OUT) ? _date_out : null;
+                return TTN_OUT != null ? _date_out : null;
             }
             set { _date_out = value; }
         }
